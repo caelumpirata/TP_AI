@@ -1113,11 +1113,19 @@ def main():
                         for i in range(
                                 len(st.session_state[f"generated2{index1}"])
                         ):
-                            with st.chat_message("human", avatar="❔"):
-                                st.write(st.session_state[f"past2{index1}"][i])
+                            if i == (len(st.session_state[f"generated2{index1}"]) - 1):
+                                with st.chat_message("human", avatar="❔"):
+                                    st.write(st.session_state[f"past2{index1}"][i])
 
-                            with st.chat_message("ai", avatar="✔"):
-                                st.write(st.session_state[f"generated2{index1}"][i])
+                                with st.chat_message("ai", avatar="✔"):
+                                    st.write_stream(list(st.session_state[f"generated2{index1}"][i]))
+
+                            else:
+                                with st.chat_message("human", avatar="❔"):
+                                    st.write(st.session_state[f"past2{index1}"][i])
+
+                                with st.chat_message("ai", avatar="✔"):
+                                    st.write(st.session_state[f"generated2{index1}"][i])
 
     # -------------------------------------------------------------------------------------------------------------------------------------
 
