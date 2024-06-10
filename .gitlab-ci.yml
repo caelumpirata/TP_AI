@@ -10,7 +10,7 @@ variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay
   TARGET_IMAGE: savantripathi22/tp_ai
-  TARGET_TAG: june_10
+  TARGET_TAG: june_10_1
 
 # Define stages
 stages:
