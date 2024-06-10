@@ -18,12 +18,12 @@ RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install tabulate
 RUN pip install langchain-community
 RUN pip install pandasai==1.4.10
-RUN pip install wikipedia
 RUN pip install numexpr
 RUN pip install --no-cache-dir mitosheet
-RUN pip install streamlit_option_menu streamlit_extras streamlit_modal
-RUN pip install langchain_experimental streamlit matplotlib pandas streamlit_chat pygwalker langchain openai psycopg2-binary langchain_core langchain_groq
+RUN pip install streamlit_extras streamlit_modal
+RUN pip install langchain_experimental streamlit matplotlib pandas streamlit_chat pygwalker langchain openai psycopg2 langchain_core langchain_groq
 RUN pip install dask dask[dataframe]
+
 
 COPY TP.py .
 COPY style.css .
