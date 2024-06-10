@@ -1,0 +1,126 @@
+
+DELETE FROM  meter_Data_ems_surat AS e1
+WHERE EXISTS (
+    SELECT 1
+    FROM meter_Data_ems_surat AS e2
+    WHERE e2."timestamp" > e1."timestamp"
+    AND e2."KWH" < e1."KWH"
+);
+
+DROP MATERIALIZED VIEW view_name;
+
+
+CREATE MATERIALIZED VIEW kwh_0003_glide
+WITH (timescaledb.continuous) AS
+SELECT location_name,
+   time_bucket(INTERVAL '15 min', "timestamp") AS bucket,
+   AVG("KWH"),
+   MAX("KWH"),
+   MIN("KWH"),
+   MAX("KWH") - MIN("KWH") as consumption
+FROM meter_Data_ems_surat where meter_id = '0003' and location_name = 'Glide_Path'
+GROUP BY bucket, location_name order by bucket;
+
+
+
+select * from kwh_0003_dvor;
+
+
+
+
+
+select distinct meter_id, location_name from  meter_Data_ems_surat order by meter_id ;
+
+
+select "KWH","timestamp" from  meter_Data_ems_surat where meter_id = '0003' and location_name = 'Glide_Path' and "timestamp" between '2022-04-11 19:45:00' and '2022-04-11 20:00:00';
+
+
+select "timestamp", "KWH" from  meter_Data_ems_surat where meter_id = '0003' and location_name = 'DVOR'  order by "timestamp" limit 10 ;
+
+
+
+
+with Best_Sales as (
+    select "KWH","timestamp", lag("KWH",1) over(order by "timestamp") as lag
+    from meter_data_ems_surat where meter_id = '0003' and location_name = 'Glide_Path'
+)
+select "KWH","timestamp"
+from Best_Sales
+where "KWH" < lag limit 100;
+
+
+
+
+
+
+
+
+delete
+from meter_data_ems_surat where meter_id = '0003' and location_name = 'Localizer' and "KWH" < "prev_kwh";
+
+
+
+with Best_Sales as (
+    select * ,lag("KWH",1) over(order by "timestamp") as lag
+    from meter_data_ems_surat where meter_id = '0003' and location_name = 'Localizer'
+)
+update meter_data_ems_surat set "prev_kwh" = Best_Sales."lag"
+from Best_Sales
+where meter_data_ems_surat."timestamp" = Best_Sales."timestamp" ;
+
+
+
+
+
+
+
+
+CREATE TABLE IF NOT EXISTS public.meter
+(
+    "timestamp" timestamp without time zone,
+    host text COLLATE pg_catalog."default",
+    "L2" double precision,
+    "KWH" double precision,
+    "V_R" double precision,
+    "KA_R" double precision,
+    "KT_TOTAL" double precision,
+    "Ppload_status" double precision,
+    "Q_Y" double precision,
+    "Ln" double precision,
+    "KT_R" double precision,
+    meter_id text COLLATE pg_catalog."default",
+    "KT_Y" double precision,
+    "V_avg" double precision,
+    "L1" double precision,
+    "KA_Y" double precision,
+    "V_RY" double precision,
+    "Q_R" double precision,
+    "V_YB" double precision,
+    "KA_B" double precision,
+    "KA_TOTAL" double precision,
+    datetime text COLLATE pg_catalog."default",
+    "V_B" double precision,
+    "Q_B" double precision,
+    "Freq" double precision,
+    "V_Y" double precision,
+    "Pnload_status" double precision,
+    "KT_B" double precision,
+    location_name text COLLATE pg_catalog."default",
+    "V_RB" double precision,
+    "L3" double precision,
+    "Q_AVG" double precision,
+    "prev_kwh" double precision
+);
+
+SELECT create_hypertable('meter', 'timestamp');
+
+
+z^{mG:*/tA+vRtRU;PG+_cc<
+
+
+
+
+
+
+
+SELECT * FROM timescaledb_information.continuous_aggregates;
