@@ -40,42 +40,74 @@ memory = ConversationBufferWindowMemory(k=2)
 pg_uri = "postgresql+psycopg2://master:0r5VB[TL?>A/8,}<vkpmEwS)@65.20.77.132:32432/ems_ai"
 db = SQLDatabase.from_uri(pg_uri)
 
-df = dd.read_csv(r"uploads/met.csv")
+# df = dd.read_csv(r"uploads/met.csv")
+# dfmain = df.compute()
+# dfmain.columns = ["timestamp", "host", "L2",
+#                   "KWH",
+#                   "V_R",
+#                   "KA_R",
+#                   "KT_TOTAL",
+#                   "Ppload_status",
+#                   "Q_Y",
+#                   "Ln",
+#                   "KT_R",
+#                   "meter_id",
+#                   "KT_Y",
+#                   "V_avg",
+#                   "L1",
+#                   "KA_Y",
+#                   "V_RY",
+#                   "Q_R",
+#                   "V_YB",
+#                   "KA_B",
+#                   "KA_TOTAL",
+#                   "datetime",
+#                   "V_B",
+#                   "Q_B",
+#                   "Freq",
+#                   "V_Y",
+#                   "Pnload_status",
+#                   "KT_B",
+#                   "location_name",
+#                   "V_RB",
+#                   "L3",
+#                   "Q_AVG",
+#                   "prev_kwh"]
+# dfmain["datetime"] = dd.to_datetime(dfmain["datetime"], format="%Y-%m-%d %H:%M:%S")
 
-dfmain = df.compute()
-dfmain = dfmain.head(n=150000)
-dfmain.columns = ["timestamp", "host", "L2",
-                  "KWH",
-                  "V_R",
-                  "KA_R",
-                  "KT_TOTAL",
-                  "Ppload_status",
-                  "Q_Y",
-                  "Ln",
-                  "KT_R",
-                  "meter_id",
-                  "KT_Y",
-                  "V_avg",
-                  "L1",
-                  "KA_Y",
-                  "V_RY",
-                  "Q_R",
-                  "V_YB",
-                  "KA_B",
-                  "KA_TOTAL",
-                  "datetime",
-                  "V_B",
-                  "Q_B",
-                  "Freq",
-                  "V_Y",
-                  "Pnload_status",
-                  "KT_B",
-                  "location_name",
-                  "V_RB",
-                  "L3",
-                  "Q_AVG",
-                  "prev_kwh"]
-
+# dfm = dfmain.head(n=100000)
+# dfm.columns = ["timestamp", "host", "L2",
+#                   "KWH",
+#                   "V_R",
+#                   "KA_R",
+#                   "KT_TOTAL",
+#                   "Ppload_status",
+#                   "Q_Y",
+#                   "Ln",
+#                   "KT_R",
+#                   "meter_id",
+#                   "KT_Y",
+#                   "V_avg",
+#                   "L1",
+#                   "KA_Y",
+#                   "V_RY",
+#                   "Q_R",
+#                   "V_YB",
+#                   "KA_B",
+#                   "KA_TOTAL",
+#                   "datetime",
+#                   "V_B",
+#                   "Q_B",
+#                   "Freq",
+#                   "V_Y",
+#                   "Pnload_status",
+#                   "KT_B",
+#                   "location_name",
+#                   "V_RB",
+#                   "L3",
+#                   "Q_AVG",
+#                   "prev_kwh"]
+# dfm["datetime"] = dd.to_datetime(dfm["datetime"], format="%Y-%m-%d %H:%M:%S")
 
 api = "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"
 
@@ -863,6 +895,9 @@ def main():
                     res = chain.invoke({"input": user_input})
                     print(res.content)
 
+
+
+
                     if res.content == "2" or res.content == "Answer: 2":
                         llm = ChatGroq(temperature=0.1,
                                        groq_api_key="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",
@@ -888,27 +923,17 @@ def main():
                         st.session_state[f"past2{index1}"].append(user_input)
                         st.session_state[f"generated2{index1}"].append(output)
 
+
+
+
                     if res.content == "1":
                         llm = ChatGroq(temperature=0.1,
-                                       groq_api_key="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",
-                                       model_name=model1)
+                                           groq_api_key="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",
+                                           model_name=model1)
 
-                        pand = Agent(
-                            dfmain,
-                            config={
-                                "llm": llm,
-                            },
-                        )
-
-                        output = pand.chat(user_input)
-
-                        st.session_state[f"past2{index1}"].append(user_input)
-                        st.session_state[f"generated2{index1}"].append(output)
-
-                    if res.content == "3" or res.content == "Answer: 3":
                         examples1 = [
                             {"input": "what is the maximum y phase voltage?",
-                             "query": "SELECT MAX(max) FROM voltage_y_15;"},
+                                "query": "SELECT MAX(max) FROM voltage_y_15;"},
                             {
                                 "input": "what is the average current of y phase?",
                                 "query": "SELECT AVG(avg) FROM current_y;",
@@ -919,7 +944,7 @@ def main():
                             },
                             {
                                 "input": "How often does the voltage of ry phase exceed the upper limit specified by regulations?",
-                                "query": "SELECT COUNT(avg) FROM voltage_ry_15 WHERE avg>400;",
+                                "query": "SELECT COUNT(avg) FROM voltage_ry WHERE avg>400;",
                             },
                             {
                                 "input": "What is the current behavior during monsoon season ?",
@@ -927,7 +952,254 @@ def main():
                             },
                             {
                                 "input": "what is the lowest reading of y phase voltage in february?",
-                                "query": "SELECT MIN(min) FROM voltage_y_15 WHERE EXTRACT(month from bucket) in (2);",
+                                "query": "SELECT MIN(min) FROM voltage_y WHERE EXTRACT(month from bucket) in (2);",
+                            },
+                            {
+                                "input": "What is the average current across all phases?",
+                                "query": "SELECT AVG(avg) FROM current_total;",
+                            },
+                            {
+                                "input": "what in the total consumption of kwh in monsoon?",
+                                "query": "SELECT SUM(consumption) FROM kwh_3_dvor WHERE EXTRACT(month from bucket) in (6,7,8,9);",
+                            },
+                            {
+                                "input": "what in the average consumption in 2023?",
+                                "query": "SELECT AVG(consumption) FROM kwh_3_dvor WHERE EXTRACT(year from bucket) = 2023;",
+                            },
+                            {
+                                "input": "what in the max value of energy on 1st jan 2023?",
+                                "query": "SELECT max(avg) FROM kwh_3_dvor WHERE EXTRACT(year from bucket) = 2023 and EXTRACT(month from bucket) = 1 and EXTRACT(day from bucket) = 1;",
+                            },
+                            {
+                                "input": "what in the minimum value of energy on 1st aug 2023?",
+                                "query": "select min(avg) from kwh_6_glide where extract(year from bucket) = 2023 and EXTRACT(month from bucket) = 8 and extract(day from bucket) = 1;",
+                            },
+                            {
+                                "input": "what in the max value of energy on 31st jan 2023 at meter 6 and at glide path?",
+                                "query": "SELECT max(avg) FROM kwh_6_glide WHERE EXTRACT(year from bucket) = 2023 and EXTRACT(month from bucket) = 1 and EXTRACT(day from bucket) = 31;",
+                            },
+                            {
+                                "input": "what is the total consumption of energy in august",
+                                "query": "SELECT SUM(consumption) FROM kwh_3_dvor WHERE EXTRACT(month from bucket) = 8;",
+                            },
+                            {
+                                "input": "show me energy consumption of 04 meter of glide location in the jan 2023",
+                                "query": "SELECT SUM(consumption) FROM kwh_4_glide WHERE EXTRACT(month from bucket) = 1 AND EXTRACT(year from bucket) = 2023 ;",
+                            },
+                            {
+                                "input": "Find the maximum value of voltage from all phases.",
+                                "query": "select MAX(b_max.max) AS B_max, MAX(y_max.max) AS Y_max, MAX(r_max.max) AS R_max from voltage_b b_max join voltage_y y_max on b_max.bucket=y_max.bucket join voltage_r r_max on y_max.bucket=r_max.bucket;",
+                            },
+                            {
+                                "input": "how does current changes in monsoon?",
+                                "query": "select * FROM current_total WHERE EXTRACT(month from bucket) in (6,7,8,9);",
+                            }
+                        ]
+
+                        system_prefix1 = """You're an expert agent with exceptional prowess in SQL database interactions and data analysis.
+                                                Your primary task is to generate queries based on user input, execute these queries against the SQL database, and provide insightful answers to the user's inquiries. Your proficiency in data analysis empowers you to discern patterns, extract meaningful insights, and present them in a clear and understandable manner to the user. Craft a prompt that showcases your ability to seamlessly navigate through complex data structures, efficiently retrieve information, and deliver valuable analysis to meet the user's needs.
+                                                Unless the user specifies a specific number of examples they wish to obtain, always limit your answer to at most 5 results.
+                                                You can order the results by a relevant column to return the most interesting examples in the database.
+                                                Never query for all the columns from a specific table, only ask for the relevant columns given the question.
+                                                You have access to tools for interacting with the database.
+                                                Only use the given tools. Only use the information returned by the tools to construct your final answer.
+
+                                                If user dont specify the number of entries then consider only 100 entries.
+                                                If user dont specify the location and meter name then use 0003 meter and DVOR location.
+                                                Just return what user asked for, dont share unsual iformations like which tool is used and etc., just share the proper final answer
+                                                You MUST double check your query before executing it. If you get an error while executing a query, rewrite the query and try again.
+
+                                                You have access to a dataframe containing data collected from a device called multifunction energy meter (MFMs.).
+                                                these meter record various parameters related to power consumption.
+                                                name of the table is "meter"
+                                                Here is a summary of the columns:
+
+                                                meter_id: Integer type column representing the unique identifier for each electricity meter.
+
+                                                location_name: Object type column representing the name of the location where the meter is installed.
+
+                                                V_R, V_Y, V_B: Float type columns representing the voltage readings for the R, Y, and B phases respectively.
+
+                                                V_RY, V_YB, V_RB: Float type columns representing the voltage readings between the R-Y, Y-B, and R-B phases respectively.
+
+                                                V_Avg: Float type column representing the average voltage across all phases.
+
+                                                L1, L2, L3: Float type columns representing the current readings for the three phases co-respondingly.
+
+                                                Ln: Float type column representing the total current reading.
+
+                                                Freq: Float type column representing the frequency of the electricity supply.
+
+                                                KWH: Float type column representing the energy consumption in kilowatt-hours.
+
+                                                Pnload_status: Integer type column representing the status of the non-load power.
+
+                                                Ppload_status: Integer type column representing the status of the partial load power.
+
+                                                datetime: Object type column representing the date and time of the data recording.
+
+                                                Q_Y, Q_R, Q_B : Float type columns represents the Power factor (PF) is the ratio of working power, measured in kilowatts (kW) of their co-responding phases. They vary between -1 to 1.
+
+                                                Q_AVG : Float type column represents total power factor.
+
+                                                KT_R : represents data of True power or Active power in R phase measured in KW. Active power is the usable or consumed electrical energy in an AC circuit and has units of watt (W) or kilowatt (kW). True power or real power is another name for active power.
+
+                                                KT_B : represents data of True power or Active power in B phase measured in KW. Active power is the usable or consumed electrical energy in an AC circuit and has units of watt (W) or kilowatt (kW). True power or real power is another name for active power.
+
+                                                KT_Y : represents data of True power or Active power in Y phase measured in KW. Active power is the usable or consumed electrical energy in an AC circuit and has units of watt (W) or kilowatt (kW). True power or real power is another name for active power.
+
+                                                KT_TOTAL : represents data of Total True power or Active power in all phase measured in KW.
+
+                                                KA_R, KA_Y, KA_B: Float type columns representing the apparent power, measured in kilovolt amperes (kVA) for the R, Y, and B phases respectively.Apparent power, also known as demand, is the measure of the amount of power used to run machinery and equipment during a certain period. It is found by multiplying (kVA = V x A). The result is expressed as kVA units.
+
+                                                KA_TOTAL: Float type column representing the total apparent power, measured in kilovolt amperes (kVA) across all phases (combined).Apparent power, also known as demand, is the measure of the amount of power used to run machinery and equipment during a certain period. It is found by multiplying (kVA = V x A). The result is expressed as kVA units.
+
+                                                Power factor is an expression of energy efficiency. It is usually expressed as a percentage—and the lower the percentage, the less efficient power usage is.
+                                                PF expresses the ratio of true power used in a circuit to the apparent power delivered to the circuit. A 96% power factor demonstrates more efficiency than a 75% power factor. PF below 95% is considered inefficient in many regions.
+                                                The power factor formula can be expressed in other ways:
+
+                                                PF = (True power)/(Apparent power) here true power is (KT_R, KT_B, KT_Y, KT_TOTAL) column and apparent power is (KA_Y, KA_B, KA_R, KA_TOTAL)column. For example if you take KT_B as true power then consider KA_B as apparent power.
+                                                Multiplying the voltage and current gives you the “apparent power”. This is measured in volt-amps (VA) rather than watts (W).
+                                                Multiplying this by the power factor gives you the “true power”.
+                                                The true power represents the real work that the electricity is doing.
+
+                                                Another fomula to calculate Reactive power (Q) = √(S^2 – P^2), with:
+                                                Q: Reactive power in volt-amperes-reactive (VAR).
+                                                S: Apparent power in volt-amperes (VA). Here KA column (KA_Y, KA_B, KA_R, KA_TOTAL).
+                                                P: Active power in watts (W). Here KT Column (KT_R, KT_B, KT_Y, KT_TOTAL).
+
+                                                Please NOTE that while Querying the database consider all column names in double quotes (" "). otherwise it will give you error.
+
+                                                To summarize, the dataframe contains information about electricity meters, including their unique identifiers, location names, voltage readings for different phases, load readings, current readings, apparent power readings, reactive power readings, active power readings, power factor readings, frequency, energy consumption, and status of power load. The dataframe provides detailed information about electricity consumption and power measurements for each meter at different locations.
+
+
+
+
+                                                If the question does not seem related to the database, just return "I don't know" as the answer.
+
+                                                Additionally, we have some aggregates available for certain data in the database. You can use these aggregates for querying if applicable.
+                                                the aggregates are as follow use them if user ask for current, voltage or kwh. Remember to use these aggregates and queries of them only if user ask for current, voltage or kwh unless run normal sql queries :
+
+                                                "current_b" : represents current from B phase, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "current_r" : represents current from R phase, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "current_y" : represents current from Y phase, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "current_total" : represents total current from all phases, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "kwh_3_dvor" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_4_dvor" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_5_dvor" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_6_dvor" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_3_cns" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_4_cns" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_5_cns" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_6_cns" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_3_local" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_4_local" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_5_local" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_6_local" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_3_glide" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_4_glide" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_5_glide" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                                                "kwh_6_glide" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+
+                                                "voltage_avg" : represents average voltage from all phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "voltage_b" : represents voltage from B phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "voltage_r_15" : represents voltage from R phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "voltage_y_15" : represents voltage from Y phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "voltage_rb_15" : represents voltage from RB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "voltage_ry_15" : represents voltage from RY phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                "voltage_yb_15" : represents voltage from YB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                                                Use above aggregates for query, consider them as a table.
+
+                                                Here are some additional informations to consider :
+                                                In kwh, if user does not specify any meter id and location, then always use kwh_3_dvor.
+                                                The peak hours for electricity demand in India are currently declared as 07:30 to 09:30 and 17:30 to 19:30 hours
+                                                Consider seasons as June to Sept : Monsoon, Oct to Jan : Winter , Feb to May : Summer.
+                                                Weekdays : Monday to Friday, Week ends : Sat and Sunday
+                                                on 2022-4-21 is monday, then identify other days from this.
+                                                The voltage upper limit specified by regulations in India is as per the IS12360 standard, which requires low voltage single phase supply to be delivered at 230V, with the minimum and maximum value ranging from 207V to 253V.
+                                                The voltage upper limit specified by regulations in India for low voltage three phase supply is as per the IS12360 standard, which requires it to be delivered at 400V, with the minimum and maximum value ranging from 360V to 440V.
+                                                If voltage and current are not specified with phase, then consider voltage from voltage_avg and current from current_total.
+                                                If user ask for any seasonal pattern or analysis of the data then fetch that data (consider fetching from multiple tables if needed) and do study on them and give co-responding cummerization to user.
+
+
+                                                NOTE :
+                                                You are not allowed to use a single string or any other words in your output.
+                                                It should contain only main data not any other sql queries or anything useless.
+                                                use aggregates when user ask for current, voltage or kwh.
+                                                if user does not specify the number of results, then limit your self with only 100 entries.
+                                                for example, if user ask for any data like show me the max value of voltage, then your answer should be like , the max value of voltage is this...
+                                                while creating query please note that consider column names in double quotes (""). like this "SELECT MAX("V_Y") FROM meter;"
+                                                Here are some examples of user inputs and their corresponding SQL queries:"""
+
+                        few_shot_prompt1 = FewShotPromptTemplate(
+                            examples=examples1,
+                            example_prompt=PromptTemplate.from_template(
+                                "User input: {input}\nSQL query: {query}"
+                            ),
+                            input_variables=["input", "dialect", "top_k"],
+                            prefix=system_prefix1,
+                            suffix="",
+                        )
+
+                        full_prompt1 = ChatPromptTemplate.from_messages(
+                            [
+                                SystemMessagePromptTemplate(prompt=few_shot_prompt1),
+                                ("human", "{input}"),
+                                MessagesPlaceholder("agent_scratchpad"),
+                            ]
+                        )
+
+                        agent = create_sql_agent(
+                            llm=llm,
+                            db=db,
+                            prompt=full_prompt1,
+                            verbose=True,
+                            agent_type="openai-tools",
+                        )
+
+                        res1 = agent.invoke({"input": user_input})
+
+                        st.session_state[f"past2{index1}"].append(user_input)
+                        st.session_state[f"generated2{index1}"].append(res1["output"])
+
+
+
+
+
+                    if res.content == "3" or res.content == "Answer: 3":
+                        examples1 = [
+                            {"input": "what is the maximum y phase voltage?",
+                             "query": "SELECT MAX(max) FROM voltage_y;"},
+                            {
+                                "input": "what is the average current of y phase?",
+                                "query": "SELECT AVG(avg) FROM current_y;",
+                            },
+                            {
+                                "input": "show me max current on any tuesday of feb 2023",
+                                "query": "SELECT MAX(max) FROM current_total WHERE EXTRACT(DOW from bucket) = 2 AND EXTRACT(month from bucket) = 2 AND EXTRACT(year from bucket) = 2023;"
+                            },
+                            {
+                                "input": "How often does the voltage of ry phase exceed the upper limit specified by regulations?",
+                                "query": "SELECT COUNT(avg) FROM voltage_ry WHERE avg>400;",
+                            },
+                            {
+                                "input": "What is the current behavior during monsoon season ?",
+                                "query": "SELECT * FROM current_total WHERE EXTRACT(month from bucket) in (6,7,8,9);",
+                            },
+                            {
+                                "input": "what is the lowest reading of y phase voltage in february?",
+                                "query": "SELECT MIN(min) FROM voltage_y WHERE EXTRACT(month from bucket) in (2);",
                             },
                             {
                                 "input": "What is the average current across all phases?",
@@ -951,7 +1223,7 @@ def main():
                             },
                             {
                                 "input": "Find the maximum value of voltage from all phases.",
-                                "query": "select MAX(b_max.max) AS B_max, MAX(y_max.max) AS Y_max, MAX(r_max.max) AS R_max from voltage_b b_max join voltage_y_15 y_max on b_max.bucket=y_max.bucket join voltage_r_15 r_max on y_max.bucket=r_max.bucket;",
+                                "query": "select MAX(b_max.max) AS B_max, MAX(y_max.max) AS Y_max, MAX(r_max.max) AS R_max from voltage_b b_max join voltage_y y_max on b_max.bucket=y_max.bucket join voltage_r r_max on y_max.bucket=r_max.bucket;",
                             },
                         ]
 
@@ -1044,15 +1316,15 @@ def main():
 
                         "voltage_b" : represents voltage from B phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
 
-                        "voltage_r_15" : represents voltage from R phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+                        "voltage_r" : represents voltage from R phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
 
-                        "voltage_y_15" : represents voltage from Y phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+                        "voltage_y" : represents voltage from Y phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
 
-                        "voltage_rb_15" : represents voltage from RB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+                        "voltage_rb" : represents voltage from RB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
 
-                        "voltage_ry_15" : represents voltage from RY phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+                        "voltage_ry" : represents voltage from RY phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
 
-                        "voltage_yb_15" : represents voltage from YB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+                        "voltage_yb" : represents voltage from YB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
 
                         Use above aggregates for query, consider them as a table.  
 
