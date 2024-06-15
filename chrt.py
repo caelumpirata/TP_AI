@@ -39,66 +39,6 @@ pg_uri = "postgresql+psycopg2://master:0r5VB[TL?>A/8,}<vkpmEwS)@65.20.77.132:324
 db = SQLDatabase.from_uri(pg_uri)
 
 
-api = "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"
-
-def plot_data(df):
-    # Check the number of columns
-    num_columns = len(df.columns)
-
-    # If there are only two columns, plot one against the other
-    if num_columns == 2:
-        x_col = df.columns[0]
-        y_col = df.columns[1]
-        
-        fig, ax = plt.subplots()
-        ax.plot(df[x_col], df[y_col], marker='o')
-        ax.set_xlabel(x_col)
-        ax.set_ylabel(y_col)
-        ax.set_title(f'{y_col} vs {x_col}')
-        
-        st.pyplot(fig)
-        
-    # If there are multiple columns, plot each column against a specified column in a single chart
-    else:
-        # Set the reference column (e.g., 'bucket' or 'timestamp')
-        ref_col = 'timestamp' if 'timestamp' in df.columns else 'bucket'
-        
-        if ref_col not in df.columns:
-            st.error("No suitable reference column found (expected 'timestamp' or 'bucket').")
-            return
-        
-        fig, ax = plt.subplots()
-        for col in df.columns:
-            if col != ref_col:
-                ax.plot(df[ref_col], df[col], marker='o', label=col)
-        
-        ax.set_xlabel(ref_col)
-        ax.set_ylabel('Values')
-        ax.set_title(f'Columns vs {ref_col}')
-        ax.legend()
-        
-        st.pyplot(fig)
-
-
-
-class StreamlitResponse(ResponseParser):
-    def __init__(self, context) -> None:
-        super().__init__(context)
-
-    def format_dataframe(self, result):
-        st.dataframe(result["value"])
-
-        return
-
-    def format_plot(self, result):
-        # st.write(result)
-        st.image(result.get("value", "").split("/")[-1])
-        return
-
-    def format_other(self, result):
-        st.write(result["value"])
-        return
-
 
 # Function to save number to a text file
 def save_number_to_file(number):
