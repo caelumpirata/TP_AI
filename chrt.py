@@ -7,25 +7,19 @@ from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTempla
 from langchain_groq import ChatGroq
 from pygwalker.api.streamlit import StreamlitRenderer, init_streamlit_comm
 from streamlit_chat import message
-from langchain_community.chat_models import ChatOpenAI
 import tempfile
 import psycopg2
 from langchain.agents.agent import AgentExecutor
 from mitosheet.streamlit.v1 import spreadsheet
-from langchain_community.llms import OpenAI
 from langchain.agents import AgentType
-from langchain_experimental.agents.agent_toolkits.csv.base import create_csv_agent
 from langchain.memory import ConversationBufferWindowMemory
 import pandas as pd
 import streamlit as st
-from pandasai import Agent
-from pandasai.llm import OpenAI
 import dask.dataframe as dd
 from pandasai.responses.response_parser import ResponseParser
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 import re
 import random
-from pandasai import SmartDataframe
 from langchain.agents import create_openai_tools_agent
 import matplotlib.pyplot as plt
 
@@ -145,534 +139,535 @@ def main():
     Main = st.sidebar.checkbox("Chat With Your data?", key="first")
 
     if Main:
-        # with open("style.css") as styl:
-        #     st.markdown(f"<style>{styl.read()}</style>", unsafe_allow_html=True)
-        user_option = st.sidebar.selectbox("Choose an option:", ["", "CSV", "SQL"])
+        st.warning("This feature is in Beta testing, we will Provide it sooner..!")
+        # # with open("style.css") as styl:
+        # #     st.markdown(f"<style>{styl.read()}</style>", unsafe_allow_html=True)
+        # user_option = st.sidebar.selectbox("Choose an option:", ["", "CSV", "SQL"])
 
-        if user_option == "CSV":
+        # if user_option == "CSV":
 
-            csv = st.sidebar.file_uploader("upload", type="csv", accept_multiple_files=True)
+        #     csv = st.sidebar.file_uploader("upload", type="csv", accept_multiple_files=True)
 
-            if csv is None:
-                st.warning("Please upload File....")
+        #     if csv is None:
+        #         st.warning("Please upload File....")
 
-            csvFiles = []
-            for file in csv:
-                csvFiles.append(file.name)
+        #     csvFiles = []
+        #     for file in csv:
+        #         csvFiles.append(file.name)
 
-            index = 0
-            csv_file = st.sidebar.selectbox("Select a File", csvFiles)
+        #     index = 0
+        #     csv_file = st.sidebar.selectbox("Select a File", csvFiles)
 
-            if csv_file:
-                for i in range(0, len(csvFiles)):
-                    if csv_file == csvFiles[i]:
-                        index = i
+        #     if csv_file:
+        #         for i in range(0, len(csvFiles)):
+        #             if csv_file == csvFiles[i]:
+        #                 index = i
 
-                csv_file = csv[index] if csv else None
+        #         csv_file = csv[index] if csv else None
 
-                if csv_file is None:
-                    st.warning("Please Upload file...")
+        #         if csv_file is None:
+        #             st.warning("Please Upload file...")
 
-                if csv_file:
-                    st.sidebar.title("Navigation")
-                    selection = st.sidebar.radio("Go to", ["Chat", "EDA"])
+        #         if csv_file:
+        #             st.sidebar.title("Navigation")
+        #             selection = st.sidebar.radio("Go to", ["Chat", "EDA"])
 
-                    # ---------------------------------------------Graph (CSV)----------------------------------------------
-
-                    if selection == "EDA":
+        #             # ---------------------------------------------Graph (CSV)----------------------------------------------
+
+        #             if selection == "EDA":
 
-                        eda = st.sidebar.selectbox("Choose", ["MITO", "PyGWalker"])
+        #                 eda = st.sidebar.selectbox("Choose", ["MITO", "PyGWalker"])
 
-                        if eda == "PyGWalker":
-                            # Save the uploaded CSV file to a temporary location
-                            temp_csv_path = f"temp_csv{index}.csv"
-                            with open(temp_csv_path, "wb") as temp_csv_file:
-                                temp_csv_file.write(csv_file.read())
+        #                 if eda == "PyGWalker":
+        #                     # Save the uploaded CSV file to a temporary location
+        #                     temp_csv_path = f"temp_csv{index}.csv"
+        #                     with open(temp_csv_path, "wb") as temp_csv_file:
+        #                         temp_csv_file.write(csv_file.read())
 
-                            try:
-                                # Try reading the CSV file with 'utf-8' encoding
-                                df = pd.read_csv(temp_csv_path, encoding="utf-8")
-                            except UnicodeDecodeError:
-                                try:
-                                    # Try reading the CSV file with 'latin1' encoding
-                                    df = pd.read_csv(temp_csv_path, encoding="latin1")
-                                except UnicodeDecodeError:
-                                    # Try reading the CSV file with 'iso-8859-1' encoding
-                                    df = pd.read_csv(temp_csv_path, encoding="iso-8859-1")
+        #                     try:
+        #                         # Try reading the CSV file with 'utf-8' encoding
+        #                         df = pd.read_csv(temp_csv_path, encoding="utf-8")
+        #                     except UnicodeDecodeError:
+        #                         try:
+        #                             # Try reading the CSV file with 'latin1' encoding
+        #                             df = pd.read_csv(temp_csv_path, encoding="latin1")
+        #                         except UnicodeDecodeError:
+        #                             # Try reading the CSV file with 'iso-8859-1' encoding
+        #                             df = pd.read_csv(temp_csv_path, encoding="iso-8859-1")
 
-                            # Show the data in a table
-                            st.write("Data:")
-                            st.write(df)
+        #                     # Show the data in a table
+        #                     st.write("Data:")
+        #                     st.write(df)
 
-                            # Establish communication between pygwalker and streamlit
-                            init_streamlit_comm()
+        #                     # Establish communication between pygwalker and streamlit
+        #                     init_streamlit_comm()
 
-                            # Get an instance of pygwalker's renderer. You should cache this instance to effectively prevent the growth of in-process memory.
-                            @st.cache_resource
-                            def get_pyg_renderer(df) -> "StreamlitRenderer":
-                                # When you need to publish your app to the public, you should set the debug parameter to False to prevent other users from writing to your chart configuration file.
-                                return StreamlitRenderer(df, spec="./gw_config.json", debug=False)
-
-                            renderer = get_pyg_renderer(df)
-
-                            # Render your data exploration interface. Developers can use it to build charts by drag and drop.
-                            renderer.render_explore()
-
-                        if eda == "MITO":
-                            temp_csv_path = f"temp_csv{index}.csv"
-                            with open(temp_csv_path, "wb") as temp_csv_file:
-                                temp_csv_file.write(csv_file.read())
-
-                            try:
-                                # Try reading the CSV file with 'utf-8' encoding
-                                df = pd.read_csv(temp_csv_path, encoding="utf-8")
-                            except UnicodeDecodeError:
-                                try:
-                                    # Try reading the CSV file with 'latin1' encoding
-                                    df = pd.read_csv(temp_csv_path, encoding="latin1")
-                                except UnicodeDecodeError:
-                                    # Try reading the CSV file with 'iso-8859-1' encoding
-                                    df = pd.read_csv(temp_csv_path, encoding="iso-8859-1")
-
-                            final_dfs, code = spreadsheet(df)
-
-                            # Display the code that corresponds to the script
-                            st.code(code)
-
-                    # -----------------------------------------------Chat (CSV)-------------------------------------------------
-
-                    elif selection == "Chat":
-
-                        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                            tmp_file.write(csv_file.getvalue())
-                            tmp_file_path = tmp_file.name
-
-                        if f"history{index}" not in st.session_state:
-                            st.session_state[f"history{index}"] = []
-
-                        if f"past{index}" not in st.session_state:
-                            st.session_state[f"past{index}"] = ["Hey ! 👋"]
-
-                        if f"generated{index}" not in st.session_state:
-                            st.session_state[f"generated{index}"] = [
-
-                                "Hello !... Ask me anything about " + csv_file.name
-
-                            ]
-
-                            llm = ChatOpenAI(openai_api_key=api,
-                                             temperature=0,
-                                             model="gpt-3.5-turbo-1106")
-
-                            def conversational_chat(query, tm):
-                                agent = create_csv_agent(
-                                    ChatOpenAI(
-                                        openai_api_key=api,
-                                        temperature=0,
-                                        model="gpt-3.5-turbo-1106",
-                                    ),
-                                    path=tm,
-                                    verbose=True,
-                                    agent_type=AgentType.OPENAI_FUNCTIONS,
-                                    memory=memory,
-                                )
-                                result = agent.run(query)
-                                # st.write(agent.agent.llm_chain.prompt.template)
-                                return result
-
-                            user_input = "what this file is about? or explain all columns of this file"
-
-                            output = conversational_chat(user_input.lower(), tmp_file_path)
-
-                            st.session_state[f"generated{index}"].insert(1, output)
-                            st.session_state[f"past{index}"].insert(1, user_input)
-
-                        # container for the chat history
-                        response_container = st.container()
-
-                        user_input = st.chat_input("How can i assist you?")
-
-                        with st.container():
-
-                            # -----------------------------------NLP Graphs-----------------------------------------------------
-
-                            keys = [
-                                "graph",
-                                "chart",
-                                "plot",
-                                "chrt",
-                                "chatr",
-                                "garph",
-                                "grph",
-                            ]
-                            if user_input:
-                                for one in keys:
-                                    if one in user_input.lower():
-                                        try:
-                                            # Try reading the CSV file with 'utf-8' encoding
-                                            df = pd.read_csv(
-                                                tmp_file_path, encoding="utf-8"
-                                            )
-                                        except UnicodeDecodeError:
-
-                                            try:
-                                                # Try reading the CSV file with 'latin1' encoding
-                                                df = pd.read_csv(
-                                                    tmp_file_path, encoding="latin1"
-                                                )
-                                            except UnicodeDecodeError:
-
-                                                # Try reading the CSV file with 'iso-8859-1' encoding
-
-                                                df = pd.read_csv(
-                                                    tmp_file_path, encoding="iso-8859-1"
-                                                )
-                                        llm = ChatOpenAI(
-                                            openai_api_key=api)
-
-                                        pand = Agent(
-                                            df,
-                                            config={
-                                                "response_parser": StreamlitResponse,
-                                                "llm": llm,
-                                            },
-                                        )
-
-                                        wait_msg = st.warning(
-                                            "Generating grpah! please wait....."
-                                        )
-
-                                        pand.chat(user_input)
-                                        wait_msg.empty()
-                                        output = "Graph generated...."
-
-                                # ----------------------------------------Normal Chat-------------------------------------------
-
-                                if (
-                                        "graph" not in user_input.lower()
-                                        and "chart" not in user_input.lower()
-                                        and "plot" not in user_input.lower()
-                                ):
-                                    def conversational_chat(query, tm):
-                                        agent = create_csv_agent(
-                                            ChatOpenAI(
-                                                openai_api_key=api,
-                                                temperature=0,
-                                                model="gpt-3.5-turbo-1106",
-
-                                            ),
-                                            path=tm,
-                                            memory=memory,
-                                            verbose=True,
-
-                                            agent_type=AgentType.OPENAI_FUNCTIONS,
-                                        )
-
-                                        result = agent.run(query)
-                                        return result
-
-                                    output = conversational_chat(
-                                        user_input.lower()
-                                        .replace("graph", "")
-                                        .replace("chart", "")
-                                        .replace("plot", ""),
-                                        tmp_file_path
-                                    )
-
-                                st.session_state[f"past{index}"].append(user_input)
-                                st.session_state[f"generated{index}"].append(output)
-
-                            if st.session_state[f"generated{index}"]:
-
-                                with response_container:
-                                    for i in range(
-                                            len(st.session_state[f"generated{index}"])
-                                    ):
-                                        message(
-                                            st.session_state[f"past{index}"][i],
-                                            is_user=True,
-                                            key=str(i) + "_user",
-                                            avatar_style="no-avatar",
-                                        )
-                                        message(
-                                            st.session_state[f"generated{index}"][i],
-                                            key=str(i),
-                                            avatar_style="no-avatar",
-                                        )
-
-            else:
-
-                st.warning("Please upload file.....!")
-
-        # --------------------------------------------SQL Section---------------------------------------------------------
-
-        elif user_option == "SQL":
-            st.header("SQL Database Connection")
-
-            # Streamlit input for database connection details
-            host = st.text_input("Host:")
-            user = st.text_input("Username:")
-            password = st.text_input("Password:", type="password")
-            database = st.text_input("Database:")
-            port = st.text_input("port:")
-
-            if st.checkbox("Connect"):
-                if host and user and password and port and database:
-
-                    conn = create_database_connection(host, user, password, database, port)
-                    st.success("Successfully connected to the database.")
-
-                    # --------------------------------- To Add New Connection -------------------------------------
-
-                    get_table_names_query = """SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
-                                            """
-
-                    cursor = conn.cursor()
-                    cursor.execute(get_table_names_query)
-
-                    table_names = cursor.fetchall()
-                    table_names_list = [table_name[0] for table_name in table_names]
-
-                    table_names_list.insert(0, " ")
-                    table = st.selectbox("Choose table", table_names_list)
-
-                    if table == " " or table is None:
-                        st.warning("Please Enter Table name.....")
-                    else:
-                        data_index = table_names_list.index(table)
-
-                        table_connections[table] = conn
-
-                        new_database_csv_path = rf"{table}.csv"
-
-                        query = f"SELECT * FROM {table}"
-                        df = pd.read_sql_query(query, conn)
-                        df.to_csv(new_database_csv_path, index=False, encoding="utf-8")
-
-                        st.sidebar.title("TP AI Assistant")
-
-                        st.sidebar.title("Navigation")
-                        selection = st.sidebar.radio("Go to", ["Chat", "EDA"])
-
-                        #
-                        if selection == "Chat":
-                            # Query the data from the database table
-                            query = f"SELECT * FROM {table}"
-                            df = pd.read_sql_query(query, conn)
-
-                            tmp_file_paths = rf"{table}.csv"
-                            df.to_csv(tmp_file_paths, index=False, encoding="utf-8")
-
-                            if f"hstry{data_index}" not in st.session_state:
-                                st.session_state[f"hstry{data_index}"] = []
-
-                            if f"generat{data_index}" not in st.session_state:
-                                st.session_state[f"generat{data_index}"] = [
-                                    "Hello!.. Ask me anything about " + f"{table}"
-                                ]
-
-                            if f"PAST{data_index}" not in st.session_state:
-                                st.session_state[f"PAST{data_index}"] = ["Hey ! 👋"]
-
-                                def conversational_chat(query):
-                                    agent = create_csv_agent(
-                                        ChatOpenAI(
-                                            openai_api_key=api,
-                                            temperature=0,
-                                            model="gpt-3.5-turbo-1106",
-                                        ),
-                                        path=tmp_file_paths,
-                                        memory=memory,
-                                        verbose=True,
-                                        agent_type=AgentType.OPENAI_FUNCTIONS,
-                                    )
-
-                                    result = agent.run(query)
-                                    return result
-
-                                user1 = f"Please explain all columns in in this data."
-                                output1 = conversational_chat(user1.lower())
-
-                                st.session_state[f"PAST{data_index}"].append(user1)
-                                st.session_state[f"generat{data_index}"].append(output1)
-
-                            def conversational_chat(query):
-                                agent = create_csv_agent(
-                                    ChatOpenAI(
-                                        openai_api_key=api,
-                                        temperature=0,
-                                        model="gpt-3.5-turbo-1106",
-                                    ),
-                                    path=tmp_file_paths,
-                                    memory=memory,
-                                    verbose=True,
-                                    agent_type=AgentType.OPENAI_FUNCTIONS,
-                                )
-
-                                result = agent.run(query)
-                                return result
-
-                            # container for the chat hstry
-                            response_container = st.container()
-                            # container for the user's text input
-                            container = st.container()
-
-                            with open("style.css") as styl:
-                                st.markdown(
-                                    f"<style>{styl.read()}</style>", unsafe_allow_html=True
-                                )
-
-                            with st.form(key="my_form", clear_on_submit=True):
-                                user_input = st.text_input(
-                                    placeholder="Talk about your database here (:",
-                                    key="input",
-                                )
-                                submit_button = st.form_submit_button(label="Send")
-
-                            with container:
-
-                                if submit_button and user_input:
-
-                                    # ----------------------------------NLP Graphs (SQL)------------------------------------
-                                    if user_input.lower() != "exit":
-                                        keys = [
-                                            "graph",
-                                            "chart",
-                                            "plot",
-                                            "chrt",
-                                            "chatr",
-                                            "garph",
-                                            "grph",
-                                        ]
-                                        for one in keys:
-                                            if one in user_input.lower():
-                                                llm = OpenAI(openai_api_key=api)
-                                                pand = Agent(
-                                                    df,
-                                                    config={
-                                                        "response_parser": StreamlitResponse,
-                                                        "llm": llm,
-                                                    },
-                                                )
-
-                                                wait_msg = st.warning(
-                                                    "Generating grpah! please wait....."
-                                                )
-
-                                                # st.set_option('deprecation.showPyplotGlobalUse', False)
-                                                pand.chat(user_input)
-
-                                                wait_msg.empty()
-                                                output = "Graph generated...."
-
-                                                # if output:
-                                                #     os.remove(
-                                                #         os.path.join(image_folder, latest_image)
-                                                #     )
-                                            # ---------------------Normal chat (SQL)----------------------------------------
-
-                                        if (
-                                                "graph" not in user_input.lower()
-                                                and "chart" not in user_input.lower()
-                                                and "plot" not in user_input.lower()
-                                        ):
-                                            def conversational_chat(query):
-                                                agent = create_csv_agent(
-                                                    ChatOpenAI(
-                                                        openai_api_key=api,
-                                                        temperature=0,
-                                                        model="gpt-3.5-turbo-1106",
-                                                    ),
-                                                    path=tmp_file_paths,
-                                                    memory=memory,
-                                                    verbose=True,
-                                                    agent_type=AgentType.OPENAI_FUNCTIONS,
-                                                )
-
-                                                result = agent.run(query)
-                                                return result
-
-                                            output = conversational_chat(user_input)
-
-                                        st.session_state[f"PAST{data_index}"].append(
-                                            user_input
-                                        )
-                                        st.session_state[f"generat{data_index}"].append(
-                                            output
-                                        )
-                                    else:
-                                        output = "Bye !, have a nice day..."
-                                        st.session_state[f"PAST{data_index}"].append(
-                                            user_input
-                                        )
-                                        st.session_state[f"generat{data_index}"].append(
-                                            output
-                                        )
-
-                                if st.session_state[f"generat{data_index}"]:
-                                    with response_container:
-                                        for i in range(
-                                                len(st.session_state[f"generat{data_index}"])
-                                        ):
-                                            message(
-                                                st.session_state[f"PAST{data_index}"][i],
-                                                is_user=True,
-                                                key=str(i) + "_user",
-                                                avatar_style="no-avatar",
-                                            )
-                                            message(
-                                                st.session_state[f"generat{data_index}"][i],
-                                                key=str(i),
-                                                avatar_style="no-avatar",
-                                            )
-
-                        # -----------------------------------Graph (SQL)--------------------------------------------------
-
-                        if selection == "EDA":
-
-                            eda = st.sidebar.selectbox("choose", ["MITO", "PyGWalker"])
-
-                            if eda == "PyGWalker":
-                                # Query the data from the database table
-                                query = f"SELECT * FROM {table}"
-                                df = pd.read_sql_query(query, conn)
-
-                                tmp_file_paths = rf"{table}.csv"
-                                df.to_csv(tmp_file_paths, index=False, encoding="utf-8")
-
-                                # Show the data in a table
-                                st.write("Table Data:")
-                                st.write(df)
-
-                                # Establish communication between pygwalker and streamlit
-                                init_streamlit_comm()
-
-                                # Get an instance of pygwalker's renderer. You should cache this instance to effectively prevent the growth of in-process memory.
-                                @st.cache_resource
-                                def get_pyg_renderer(df) -> "StreamlitRenderer":
-                                    # When you need to publish your app to the public, you should set the debug parameter to False to prevent other users from writing to your chart configuration file.
-                                    return StreamlitRenderer(df, spec="./gw_config.json", debug=False)
-
-                                renderer = get_pyg_renderer(df)
-
-                                # Render your data exploration interface. Developers can use it to build charts by drag and drop.
-                                renderer.render_explore()
-
-                            if eda == "MITO":
-                                # Query the data from the database table
-                                query = f"SELECT * FROM {table}"
-                                df = pd.read_sql_query(query, conn)
-
-                                tmp_file_paths = rf"{table}.csv"
-                                df.to_csv(tmp_file_paths, index=False, encoding="utf-8")
-
-                                final_dfs, code = spreadsheet(df)
-
-                                # Display the code that corresponds to the script
-                                st.code(code)
-
-            else:
-                st.error("Please fill in all the database connection details.")
+        #                     # Get an instance of pygwalker's renderer. You should cache this instance to effectively prevent the growth of in-process memory.
+        #                     @st.cache_resource
+        #                     def get_pyg_renderer(df) -> "StreamlitRenderer":
+        #                         # When you need to publish your app to the public, you should set the debug parameter to False to prevent other users from writing to your chart configuration file.
+        #                         return StreamlitRenderer(df, spec="./gw_config.json", debug=False)
+
+        #                     renderer = get_pyg_renderer(df)
+
+        #                     # Render your data exploration interface. Developers can use it to build charts by drag and drop.
+        #                     renderer.render_explore()
+
+        #                 if eda == "MITO":
+        #                     temp_csv_path = f"temp_csv{index}.csv"
+        #                     with open(temp_csv_path, "wb") as temp_csv_file:
+        #                         temp_csv_file.write(csv_file.read())
+
+        #                     try:
+        #                         # Try reading the CSV file with 'utf-8' encoding
+        #                         df = pd.read_csv(temp_csv_path, encoding="utf-8")
+        #                     except UnicodeDecodeError:
+        #                         try:
+        #                             # Try reading the CSV file with 'latin1' encoding
+        #                             df = pd.read_csv(temp_csv_path, encoding="latin1")
+        #                         except UnicodeDecodeError:
+        #                             # Try reading the CSV file with 'iso-8859-1' encoding
+        #                             df = pd.read_csv(temp_csv_path, encoding="iso-8859-1")
+
+        #                     final_dfs, code = spreadsheet(df)
+
+        #                     # Display the code that corresponds to the script
+        #                     st.code(code)
+
+        #             # -----------------------------------------------Chat (CSV)-------------------------------------------------
+
+        #             elif selection == "Chat":
+
+        #                 with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        #                     tmp_file.write(csv_file.getvalue())
+        #                     tmp_file_path = tmp_file.name
+
+        #                 if f"history{index}" not in st.session_state:
+        #                     st.session_state[f"history{index}"] = []
+
+        #                 if f"past{index}" not in st.session_state:
+        #                     st.session_state[f"past{index}"] = ["Hey ! 👋"]
+
+        #                 if f"generated{index}" not in st.session_state:
+        #                     st.session_state[f"generated{index}"] = [
+
+        #                         "Hello !... Ask me anything about " + csv_file.name
+
+        #                     ]
+
+        #                     llm = ChatOpenAI(openai_api_key=api,
+        #                                      temperature=0,
+        #                                      model="gpt-3.5-turbo-1106")
+
+        #                     def conversational_chat(query, tm):
+        #                         agent = create_csv_agent(
+        #                             ChatOpenAI(
+        #                                 openai_api_key=api,
+        #                                 temperature=0,
+        #                                 model="gpt-3.5-turbo-1106",
+        #                             ),
+        #                             path=tm,
+        #                             verbose=True,
+        #                             agent_type=AgentType.OPENAI_FUNCTIONS,
+        #                             memory=memory,
+        #                         )
+        #                         result = agent.run(query)
+        #                         # st.write(agent.agent.llm_chain.prompt.template)
+        #                         return result
+
+        #                     user_input = "what this file is about? or explain all columns of this file"
+
+        #                     output = conversational_chat(user_input.lower(), tmp_file_path)
+
+        #                     st.session_state[f"generated{index}"].insert(1, output)
+        #                     st.session_state[f"past{index}"].insert(1, user_input)
+
+        #                 # container for the chat history
+        #                 response_container = st.container()
+
+        #                 user_input = st.chat_input("How can i assist you?")
+
+        #                 with st.container():
+
+        #                     # -----------------------------------NLP Graphs-----------------------------------------------------
+
+        #                     keys = [
+        #                         "graph",
+        #                         "chart",
+        #                         "plot",
+        #                         "chrt",
+        #                         "chatr",
+        #                         "garph",
+        #                         "grph",
+        #                     ]
+        #                     if user_input:
+        #                         for one in keys:
+        #                             if one in user_input.lower():
+        #                                 try:
+        #                                     # Try reading the CSV file with 'utf-8' encoding
+        #                                     df = pd.read_csv(
+        #                                         tmp_file_path, encoding="utf-8"
+        #                                     )
+        #                                 except UnicodeDecodeError:
+
+        #                                     try:
+        #                                         # Try reading the CSV file with 'latin1' encoding
+        #                                         df = pd.read_csv(
+        #                                             tmp_file_path, encoding="latin1"
+        #                                         )
+        #                                     except UnicodeDecodeError:
+
+        #                                         # Try reading the CSV file with 'iso-8859-1' encoding
+
+        #                                         df = pd.read_csv(
+        #                                             tmp_file_path, encoding="iso-8859-1"
+        #                                         )
+        #                                 llm = ChatOpenAI(
+        #                                     openai_api_key=api)
+
+        #                                 pand = Agent(
+        #                                     df,
+        #                                     config={
+        #                                         "response_parser": StreamlitResponse,
+        #                                         "llm": llm,
+        #                                     },
+        #                                 )
+
+        #                                 wait_msg = st.warning(
+        #                                     "Generating grpah! please wait....."
+        #                                 )
+
+        #                                 pand.chat(user_input)
+        #                                 wait_msg.empty()
+        #                                 output = "Graph generated...."
+
+        #                         # ----------------------------------------Normal Chat-------------------------------------------
+
+        #                         if (
+        #                                 "graph" not in user_input.lower()
+        #                                 and "chart" not in user_input.lower()
+        #                                 and "plot" not in user_input.lower()
+        #                         ):
+        #                             def conversational_chat(query, tm):
+        #                                 agent = create_csv_agent(
+        #                                     ChatOpenAI(
+        #                                         openai_api_key=api,
+        #                                         temperature=0,
+        #                                         model="gpt-3.5-turbo-1106",
+
+        #                                     ),
+        #                                     path=tm,
+        #                                     memory=memory,
+        #                                     verbose=True,
+
+        #                                     agent_type=AgentType.OPENAI_FUNCTIONS,
+        #                                 )
+
+        #                                 result = agent.run(query)
+        #                                 return result
+
+        #                             output = conversational_chat(
+        #                                 user_input.lower()
+        #                                 .replace("graph", "")
+        #                                 .replace("chart", "")
+        #                                 .replace("plot", ""),
+        #                                 tmp_file_path
+        #                             )
+
+        #                         st.session_state[f"past{index}"].append(user_input)
+        #                         st.session_state[f"generated{index}"].append(output)
+
+        #                     if st.session_state[f"generated{index}"]:
+
+        #                         with response_container:
+        #                             for i in range(
+        #                                     len(st.session_state[f"generated{index}"])
+        #                             ):
+        #                                 message(
+        #                                     st.session_state[f"past{index}"][i],
+        #                                     is_user=True,
+        #                                     key=str(i) + "_user",
+        #                                     avatar_style="no-avatar",
+        #                                 )
+        #                                 message(
+        #                                     st.session_state[f"generated{index}"][i],
+        #                                     key=str(i),
+        #                                     avatar_style="no-avatar",
+        #                                 )
+
+        #     else:
+
+        #         st.warning("Please upload file.....!")
+
+        # # --------------------------------------------SQL Section---------------------------------------------------------
+
+        # elif user_option == "SQL":
+        #     st.header("SQL Database Connection")
+
+        #     # Streamlit input for database connection details
+        #     host = st.text_input("Host:")
+        #     user = st.text_input("Username:")
+        #     password = st.text_input("Password:", type="password")
+        #     database = st.text_input("Database:")
+        #     port = st.text_input("port:")
+
+        #     if st.checkbox("Connect"):
+        #         if host and user and password and port and database:
+
+        #             conn = create_database_connection(host, user, password, database, port)
+        #             st.success("Successfully connected to the database.")
+
+        #             # --------------------------------- To Add New Connection -------------------------------------
+
+        #             get_table_names_query = """SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+        #                                     """
+
+        #             cursor = conn.cursor()
+        #             cursor.execute(get_table_names_query)
+
+        #             table_names = cursor.fetchall()
+        #             table_names_list = [table_name[0] for table_name in table_names]
+
+        #             table_names_list.insert(0, " ")
+        #             table = st.selectbox("Choose table", table_names_list)
+
+        #             if table == " " or table is None:
+        #                 st.warning("Please Enter Table name.....")
+        #             else:
+        #                 data_index = table_names_list.index(table)
+
+        #                 table_connections[table] = conn
+
+        #                 new_database_csv_path = rf"{table}.csv"
+
+        #                 query = f"SELECT * FROM {table}"
+        #                 df = pd.read_sql_query(query, conn)
+        #                 df.to_csv(new_database_csv_path, index=False, encoding="utf-8")
+
+        #                 st.sidebar.title("TP AI Assistant")
+
+        #                 st.sidebar.title("Navigation")
+        #                 selection = st.sidebar.radio("Go to", ["Chat", "EDA"])
+
+        #                 #
+        #                 if selection == "Chat":
+        #                     # Query the data from the database table
+        #                     query = f"SELECT * FROM {table}"
+        #                     df = pd.read_sql_query(query, conn)
+
+        #                     tmp_file_paths = rf"{table}.csv"
+        #                     df.to_csv(tmp_file_paths, index=False, encoding="utf-8")
+
+        #                     if f"hstry{data_index}" not in st.session_state:
+        #                         st.session_state[f"hstry{data_index}"] = []
+
+        #                     if f"generat{data_index}" not in st.session_state:
+        #                         st.session_state[f"generat{data_index}"] = [
+        #                             "Hello!.. Ask me anything about " + f"{table}"
+        #                         ]
+
+        #                     if f"PAST{data_index}" not in st.session_state:
+        #                         st.session_state[f"PAST{data_index}"] = ["Hey ! 👋"]
+
+        #                         def conversational_chat(query):
+        #                             agent = create_csv_agent(
+        #                                 ChatOpenAI(
+        #                                     openai_api_key=api,
+        #                                     temperature=0,
+        #                                     model="gpt-3.5-turbo-1106",
+        #                                 ),
+        #                                 path=tmp_file_paths,
+        #                                 memory=memory,
+        #                                 verbose=True,
+        #                                 agent_type=AgentType.OPENAI_FUNCTIONS,
+        #                             )
+
+        #                             result = agent.run(query)
+        #                             return result
+
+        #                         user1 = f"Please explain all columns in in this data."
+        #                         output1 = conversational_chat(user1.lower())
+
+        #                         st.session_state[f"PAST{data_index}"].append(user1)
+        #                         st.session_state[f"generat{data_index}"].append(output1)
+
+        #                     def conversational_chat(query):
+        #                         agent = create_csv_agent(
+        #                             ChatOpenAI(
+        #                                 openai_api_key=api,
+        #                                 temperature=0,
+        #                                 model="gpt-3.5-turbo-1106",
+        #                             ),
+        #                             path=tmp_file_paths,
+        #                             memory=memory,
+        #                             verbose=True,
+        #                             agent_type=AgentType.OPENAI_FUNCTIONS,
+        #                         )
+
+        #                         result = agent.run(query)
+        #                         return result
+
+        #                     # container for the chat hstry
+        #                     response_container = st.container()
+        #                     # container for the user's text input
+        #                     container = st.container()
+
+        #                     with open("style.css") as styl:
+        #                         st.markdown(
+        #                             f"<style>{styl.read()}</style>", unsafe_allow_html=True
+        #                         )
+
+        #                     with st.form(key="my_form", clear_on_submit=True):
+        #                         user_input = st.text_input(
+        #                             placeholder="Talk about your database here (:",
+        #                             key="input",
+        #                         )
+        #                         submit_button = st.form_submit_button(label="Send")
+
+        #                     with container:
+
+        #                         if submit_button and user_input:
+
+        #                             # ----------------------------------NLP Graphs (SQL)------------------------------------
+        #                             if user_input.lower() != "exit":
+        #                                 keys = [
+        #                                     "graph",
+        #                                     "chart",
+        #                                     "plot",
+        #                                     "chrt",
+        #                                     "chatr",
+        #                                     "garph",
+        #                                     "grph",
+        #                                 ]
+        #                                 for one in keys:
+        #                                     if one in user_input.lower():
+        #                                         llm = OpenAI(openai_api_key=api)
+        #                                         pand = Agent(
+        #                                             df,
+        #                                             config={
+        #                                                 "response_parser": StreamlitResponse,
+        #                                                 "llm": llm,
+        #                                             },
+        #                                         )
+
+        #                                         wait_msg = st.warning(
+        #                                             "Generating grpah! please wait....."
+        #                                         )
+
+        #                                         # st.set_option('deprecation.showPyplotGlobalUse', False)
+        #                                         pand.chat(user_input)
+
+        #                                         wait_msg.empty()
+        #                                         output = "Graph generated...."
+
+        #                                         # if output:
+        #                                         #     os.remove(
+        #                                         #         os.path.join(image_folder, latest_image)
+        #                                         #     )
+        #                                     # ---------------------Normal chat (SQL)----------------------------------------
+
+        #                                 if (
+        #                                         "graph" not in user_input.lower()
+        #                                         and "chart" not in user_input.lower()
+        #                                         and "plot" not in user_input.lower()
+        #                                 ):
+        #                                     def conversational_chat(query):
+        #                                         agent = create_csv_agent(
+        #                                             ChatOpenAI(
+        #                                                 openai_api_key=api,
+        #                                                 temperature=0,
+        #                                                 model="gpt-3.5-turbo-1106",
+        #                                             ),
+        #                                             path=tmp_file_paths,
+        #                                             memory=memory,
+        #                                             verbose=True,
+        #                                             agent_type=AgentType.OPENAI_FUNCTIONS,
+        #                                         )
+
+        #                                         result = agent.run(query)
+        #                                         return result
+
+        #                                     output = conversational_chat(user_input)
+
+        #                                 st.session_state[f"PAST{data_index}"].append(
+        #                                     user_input
+        #                                 )
+        #                                 st.session_state[f"generat{data_index}"].append(
+        #                                     output
+        #                                 )
+        #                             else:
+        #                                 output = "Bye !, have a nice day..."
+        #                                 st.session_state[f"PAST{data_index}"].append(
+        #                                     user_input
+        #                                 )
+        #                                 st.session_state[f"generat{data_index}"].append(
+        #                                     output
+        #                                 )
+
+        #                         if st.session_state[f"generat{data_index}"]:
+        #                             with response_container:
+        #                                 for i in range(
+        #                                         len(st.session_state[f"generat{data_index}"])
+        #                                 ):
+        #                                     message(
+        #                                         st.session_state[f"PAST{data_index}"][i],
+        #                                         is_user=True,
+        #                                         key=str(i) + "_user",
+        #                                         avatar_style="no-avatar",
+        #                                     )
+        #                                     message(
+        #                                         st.session_state[f"generat{data_index}"][i],
+        #                                         key=str(i),
+        #                                         avatar_style="no-avatar",
+        #                                     )
+
+        #                 # -----------------------------------Graph (SQL)--------------------------------------------------
+
+        #                 if selection == "EDA":
+
+        #                     eda = st.sidebar.selectbox("choose", ["MITO", "PyGWalker"])
+
+        #                     if eda == "PyGWalker":
+        #                         # Query the data from the database table
+        #                         query = f"SELECT * FROM {table}"
+        #                         df = pd.read_sql_query(query, conn)
+
+        #                         tmp_file_paths = rf"{table}.csv"
+        #                         df.to_csv(tmp_file_paths, index=False, encoding="utf-8")
+
+        #                         # Show the data in a table
+        #                         st.write("Table Data:")
+        #                         st.write(df)
+
+        #                         # Establish communication between pygwalker and streamlit
+        #                         init_streamlit_comm()
+
+        #                         # Get an instance of pygwalker's renderer. You should cache this instance to effectively prevent the growth of in-process memory.
+        #                         @st.cache_resource
+        #                         def get_pyg_renderer(df) -> "StreamlitRenderer":
+        #                             # When you need to publish your app to the public, you should set the debug parameter to False to prevent other users from writing to your chart configuration file.
+        #                             return StreamlitRenderer(df, spec="./gw_config.json", debug=False)
+
+        #                         renderer = get_pyg_renderer(df)
+
+        #                         # Render your data exploration interface. Developers can use it to build charts by drag and drop.
+        #                         renderer.render_explore()
+
+        #                     if eda == "MITO":
+        #                         # Query the data from the database table
+        #                         query = f"SELECT * FROM {table}"
+        #                         df = pd.read_sql_query(query, conn)
+
+        #                         tmp_file_paths = rf"{table}.csv"
+        #                         df.to_csv(tmp_file_paths, index=False, encoding="utf-8")
+
+        #                         final_dfs, code = spreadsheet(df)
+
+        #                         # Display the code that corresponds to the script
+        #                         st.code(code)
+
+        #     else:
+        #         st.error("Please fill in all the database connection details.")
 
     # ---------------------------------------------Graph (CSV)----------------------------------------------
     if Main == False:
