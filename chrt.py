@@ -15,7 +15,6 @@ from langchain.agents import AgentType
 from langchain.memory import ConversationBufferWindowMemory
 import pandas as pd
 import streamlit as st
-from pandasai.responses.response_parser import ResponseParser
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 import re
 import random
