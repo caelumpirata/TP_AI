@@ -21,7 +21,6 @@ RUN pip install numexpr
 RUN pip install --no-cache-dir mitosheet
 RUN pip install streamlit_extras streamlit_modal
 RUN pip install langchain_experimental streamlit matplotlib pandas streamlit_chat pygwalker langchain openai psycopg2 langchain_core langchain_groq
-RUN pip install dask dask[dataframe]
 
 
 COPY chrt.py .
