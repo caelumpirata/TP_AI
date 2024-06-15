@@ -687,7 +687,7 @@ def main():
             # container for the chat history
             response_container = st.container()
 
-            user_input = st.chat_input("Chat your here!")
+            user_input = st.chat_input("Chat here!")
             container = st.container()
             with st.container():
 
