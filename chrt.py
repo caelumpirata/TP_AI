@@ -33,7 +33,7 @@ def create_database_connection(host, user, password, database, port):
         st.stop()
 
 
-memory = ConversationBufferWindowMemory(k=2)
+memory = ConversationBufferWindowMemory(k=7)
 
 pg_uri = "postgresql+psycopg2://master:0r5VB[TL?>A/8,}<vkpmEwS)@65.20.77.132:32432/ems_ai"
 db = SQLDatabase.from_uri(pg_uri)
@@ -50,7 +50,7 @@ def save_number_to_file(number):
 def read_numbers_from_file():
     with open("numbers.txt", "r") as file:
         numbers = [line.strip() for line in file.readlines()]
-    return numbers
+    return numbers 
 
 
 table_connections = {}
@@ -613,7 +613,7 @@ def main():
         add = st.sidebar.button("➕ New Chat")
         st.sidebar.write("Model")
         model1 = st.sidebar.selectbox("Model",
-                                      ["llama3-8b-8192", "llama3-70b-8192", " mixtral-8x7b-32768", "gemma-7b-it"])
+                                      ["llama3-70b-8192", "llama3-8b-8192", " mixtral-8x7b-32768", "gemma-7b-it"])
 
         if add:
             num = read_numbers_from_file()
@@ -777,6 +777,7 @@ def main():
                             You are not allowed to use a single string or any other words in your output.
                             It should always be 1,2 or 3.
                             Never generate any output which contains any other word or digit besides 1,2 and 3.
+                            
                             """
 
                     few_shot_prompt = FewShotPromptTemplate(
@@ -1126,9 +1127,6 @@ def main():
                             
                             query = extract_sql_query(res1["output"])
                             
-                            wait_msg = st.warning(
-                                            "Generating grpah! please wait....."
-                                        )
 
                             df = pd.read_sql(query, conn)    
                             
@@ -1154,13 +1152,14 @@ def main():
                             
                             st.line_chart(df, x=time_col, y=other.columns, color=column_colors)     
                                           
-                            wait_msg.empty()
+                            
 
                             output = "Graph Generated"
 
                         except Exception as e:
-                            wait_msg.empty()
+                            
                             output = "Sorry , I can't get that. Can you please ask again?"
+                            
 
                         st.session_state[f"past2{index1}"].append(user_input)
                         st.session_state[f"generated2{index1}"].append(output)
@@ -1176,7 +1175,7 @@ def main():
 
 
 
-                    if res.content == "1":
+                    elif res.content == "1":
                         try:
                             examples1 = [
                                 {"input": "what is the maximum y phase voltage?",
@@ -1270,17 +1269,10 @@ def main():
 
                                                                             You have access to a dataframe containing data collected from a device called multifunction energy meter (MFMs.).
                                                                             these meter record various parameters related to power consumption.
-                                                                            name of the table is "meter"
-                                                                            Here is a summary of the columns:
+                                                                            name of the table is "meter".
 
-                                                                            meter_id: Integer type column representing the unique identifier for each electricity meter.
-
-                                                                            location_name: Object type column representing the name of the location where the meter is installed.
-
-                                                                            Pnload_status: Integer type column representing the status of the non-load power.
-
-                                                                            Ppload_status: Integer type column representing the status of the partial load power.
-
+                                                                            There are total of 4 main meters named as meter 3, meter 4, metrer 5, meter 6.
+                                                                            each main meter have another 4 sub meters at different location named Glide path, CNS Equipment room, Localizer and DVOR. So, there are total of 16 meters in this data.
                                                                            
                                                                             Power factor is an expression of energy efficiency. It is usually expressed as a percentage—and the lower the percentage, the less efficient power usage is.
                                                                             PF expresses the ratio of true power used in a circuit to the apparent power delivered to the circuit. A 96% power factor demonstrates more efficiency than a 75% power factor. PF below 95% is considered inefficient in many regions.
@@ -1422,18 +1414,20 @@ def main():
                                 prompt=full_prompt1,
                                 verbose=True,
                                 agent_type="openai-tools",
+                                memory=memory,
                             )
 
                             res1 = agent.invoke({"input": user_input})
 
+                            st.session_state[f"past2{index1}"].append(user_input)
+                            st.session_state[f"generated2{index1}"].append(res1["output"])
+
                         except Exception as e:
-                            res1["ouput"] = "Sorry , I can't get that. Can you please ask again?"
+    
+                            st.session_state[f"past2{index1}"].append(user_input)
+                            st.session_state[f"generated2{index1}"].append("Sorry , I can't get that. Can you please ask again?")
 
-                        st.session_state[f"past2{index1}"].append(user_input)
-                        st.session_state[f"generated2{index1}"].append(res1["output"])
-
-
-
+                        
 
 
 
@@ -1443,113 +1437,123 @@ def main():
 
 
 
-                    if res.content == "3" or res.content == "Answer: 3":
+
+
+
+                    elif res.content == "3" or res.content == "Answer: 3":
                         try:
                             examples1 = [
                                 {"input": "what is the maximum y phase voltage?",
-                                "query": "SELECT MAX(max) FROM voltage_y ;"},
+                                "query": "SELECT MAX(max) FROM voltage_y ;",
+                                "answer" : "269.49",
+                                },
                                 {
                                     "input": "what is the average current of y phase?",
                                     "query": "SELECT AVG(avg) FROM current_y;",
+                                    "answer" : "3.225917431344184",
                                 },
                                 {
                                     "input": "show me max current on any tuesday of feb 2023",
-                                    "query": "SELECT MAX(max) FROM current_total WHERE EXTRACT(DOW from bucket) = 2 AND EXTRACT(month from bucket) = 2 AND EXTRACT(year from bucket) = 2023;"
+                                    "query": "SELECT MAX(max) FROM current_total WHERE EXTRACT(DOW from bucket) = 2 AND EXTRACT(month from bucket) = 2 AND EXTRACT(year from bucket) = 2023;",
+                                    "answer" : "17.51",
                                 },
                                 {
                                     "input": "How often does the voltage of ry phase exceed the upper limit specified by regulations?",
                                     "query": "SELECT COUNT(avg) FROM voltage_ry  WHERE avg>400;",
-                                },
-                                {
-                                    "input": "What is the current behavior during monsoon season ?",
-                                    "query": "SELECT * FROM current_total WHERE EXTRACT(month from bucket) in (6,7,8,9);",
+                                    "answer" : "193727",
                                 },
                                 {
                                     "input": "what is the lowest reading of y phase voltage in february?",
                                     "query": "SELECT MIN(min) FROM voltage_y  WHERE EXTRACT(month from bucket) in (2);",
+                                    "answer" : "0",
                                 },
                                 {
                                     "input": "What is the average current across all phases?",
                                     "query": "SELECT AVG(avg) FROM current_total;",
+                                    "answer" : "3.6986663855724378",
                                 },
                                 {
                                     "input": "what in the total consumption of kwh in monsoon?",
                                     "query": "SELECT SUM(consumption) FROM kwh_3_dvor WHERE EXTRACT(month from bucket) in (6,7,8,9);",
+                                    "answer" : "16391.129999999568",
                                 },
                                 {
                                     "input": "what in the average consumption in 2023?",
                                     "query": "SELECT AVG(consumption) FROM kwh_3_dvor WHERE EXTRACT(year from bucket) = 2023;",
+                                    "answer" : "0.9648866754751492",
                                 },
                                 {
                                     "input": "what is the total consumption of energy in august",
                                     "query": "SELECT SUM(consumption) FROM kwh_3_dvor WHERE EXTRACT(month from bucket) = 8;",
+                                    "answer" : "4677.179999999818",
                                 },
                                 {
                                     "input": "show me energy consumption of 04 meter of glide location in the jan 2023",
                                     "query": "SELECT SUM(consumption) FROM kwh_4_glide WHERE EXTRACT(month from bucket) = 1 AND EXTRACT(year from bucket) = 2023 ;",
+                                    "answer" : "175.51000000000977",
                                 },
                                 
                                 {
                                     "input": "show me power factor in monsoon",
                                     "query": 'select "avg" FROM power_fector_avg WHERE EXTRACT(month from bucket) in (6,7,8,9);',
+                                    "answer" : "0.58, -1, -0.454,......,0.54",
                                 },
                                 {
                                     "input": "what is maximum active power of r phase in august?",
                                     "query": 'SELECT MAX("max") FROM active_power_r WHERE EXTRACT(month from bucket) = 8;',
+                                    "answer" : "5.89",
                                 },
                                 {
                                     "input": "what is lowest reading of true power of y phase in august",
                                     "query": 'SELECT MIN("min") FROM active_power_y WHERE EXTRACT(month from bucket) = 8;',
+                                    "answer" : "-7.68",
                                 },
                                 {
                                     "input": "what is average apparent power reading in jan 2023 at meter 6 and at glide path",
                                     "query": """SELECT AVG("avg") FROM apparent_power_total WHERE meter_id = '6' AND location_name = 'Glide_Path' AND EXTRACT(year from bucket) = 2023 and EXTRACT(month from bucket) = 1 and EXTRACT(day from bucket) = 31;""",
+                                    "answer" : "0.1813956043956043",
                                 },
                                 {
                                     "input": "what is max frequency reading in february?",
                                     "query": 'SELECT MAX("max") FROM freq WHERE EXTRACT(month from bucket) in (2);',
+                                    "answer" : "51.54",
                                 },
                                 {
                                     "input": "what is max current in all phase current",
-                                    "query": "WITH RankedEntries AS (SELECT b_max.bucket AS time, MAX(b_max.max) AS B_max, MAX(y_max.max) AS Y_max, MAX(r_max.max) AS R_max, ROW_NUMBER() OVER (PARTITION BY DATE_TRUNC('day', b_max.bucket) ORDER BY b_max.bucket) AS rn FROM current_b b_max JOIN current_y y_max ON b_max.bucket = y_max.bucket JOIN current_r r_max ON y_max.bucket = r_max.bucket ) SELECT time, B_max, Y_max, R_max FROM RankedEntries WHERE rn <= 7 ORDER BY time LIMIT 1000;",
+                                    "query": 'select MAX("max") from current_total;',
+                                    "answer" : "107.73",
                                 },
                                 {
                                     "input": "show average voltage of all phase in march 2023",
-                                    "query": "WITH RankedEntries AS (SELECT b_max.bucket AS time, AVG(b_max.max) AS B_max, AVG(y_max.max) AS Y_max, AVG(r_max.max) AS R_max, ROW_NUMBER() OVER (PARTITION BY DATE_TRUNC('day', b_max.bucket) ORDER BY b_max.bucket) AS rn FROM voltage_b b_max JOIN voltage_y y_max ON b_max.bucket = y_max.bucket JOIN voltage_r r_max ON y_max.bucket = r_max.bucket WHERE EXTRACT(month FROM y_max.bucket) = 3 AND EXTRACT(year FROM y_max.bucket) = 2023) SELECT time, B_max, Y_max, R_max FROM RankedEntries WHERE rn <= 7 ORDER BY time LIMIT 1000;",
+                                    "query": 'select AVG("avg") from voltage_r; select AVG("avg") from voltage_y; select AVG("avg") from voltage_b;',
+                                    "answer" : "86.69330958206457, 114.1051016062832, 231.12705198690185",
                                 },
                                 {
                                     "input": "what is lowest active power of b phase in august of meter 4 and at glide location",
                                     "query": """SELECT AVG("avg") FROM active_power_b WHERE EXTRACT(month from bucket) = 8 AND meter_id = '4' AND location_name = 'Glide_Path';""",
+                                    "answer" : "0",
                                 },
 
                             ]
 
                             system_prefix1 = """You're an expert agent with exceptional prowess in SQL database interactions and data analysis.
-                                                    Your primary task is to generate queries based on user input, execute these queries against the SQL database, and provide insightful answers to the user's inquiries. Your proficiency in data analysis empowers you to discern patterns, extract meaningful insights, and present them in a clear and understandable manner to the user. Craft a prompt that showcases your ability to seamlessly navigate through complex data structures, efficiently retrieve information, and deliver valuable analysis to meet the user's needs.
+                                                    Your primary task is to execute sql queries against the SQL database, and provide insightful answers to the user's inquiries.  
                                                     Unless the user specifies a specific number of examples they wish to obtain, always limit your answer to at most 5 results.
-                                                    You can order the results by a relevant column to return the most interesting examples in the database.
                                                     Never query for all the columns from a specific table, only ask for the relevant columns given the question.
                                                     You have access to tools for interacting with the database.
                                                     Only use the given tools. Only use the information returned by the tools to construct your final answer.
 
                                                     If user dont specify the number of entries then consider only 100 entries.
-                                                    If user dont specify the location and meter name then use 0003 meter and DVOR location.
+                                                    If user dont specify the location and meter name then use '3' meter and DVOR location.
                                                     Just return what user asked for, dont share unsual iformations like which tool is used and etc., just share the proper final answer
                                                     You MUST double check your query before executing it. If you get an error while executing a query, rewrite the query and try again.
 
                                                     You have access to a dataframe containing data collected from a device called multifunction energy meter (MFMs.).
                                                     these meter record various parameters related to power consumption.
                                                     name of the table is "meter"
-                                                    Here is a summary of the columns:
 
-                                                    meter_id: Integer type column representing the unique identifier for each electricity meter.
-
-                                                    location_name: Object type column representing the name of the location where the meter is installed.
-
-                                                    Pnload_status: Integer type column representing the status of the non-load power.
-
-                                                    Ppload_status: Integer type column representing the status of the partial load power.
-
+                                                    There are total of 4 main meters named as meter 3, meter 4, metrer 5, meter 6.
+                                                    each main meter have another 4 sub meters at different location named Glide path, CNS Equipment room, Localizer and DVOR. So, there are total of 16 meters in this data. 
                                                     
                                                     Power factor is an expression of energy efficiency. It is usually expressed as a percentage—and the lower the percentage, the less efficient power usage is.
                                                     PF expresses the ratio of true power used in a circuit to the apparent power delivered to the circuit. A 96% power factor demonstrates more efficiency than a 75% power factor. PF below 95% is considered inefficient in many regions.
@@ -1666,13 +1670,29 @@ def main():
                             You are not allowed to use a single string or any other words in your output.
                             It should contain only main data not any other sql queries or anything useless.
                             for example, if user ask for any data like show me the max value of voltage, then your answer should be like , the max value of voltage is this...
-                            If user ask anything except current, voltage and kwh then use table name as "meter".
+                            
+                            never generate this type of final answer :
+
+                            ""Here is the SQL query to find the maximum R phase current in August 2023:
+
+                            SELECT MAX(max) 
+                            FROM current_r 
+                            WHERE EXTRACT(month from bucket) = 8 AND EXTRACT(year from bucket) = 2023;
+
+                            This query will return the maximum current reading for the R phase in August 2023.""
+
+                            this should not be your final answer, you have to run that query and show the result not the query.
+                            Never give only queries to final answer, always provide the result of that query by running that query.
+
+                            Your final answer should always contain the result of the query, never show query in output only the result got by the query.
+
+
                             Here are some examples of user inputs and their corresponding SQL queries:"""
 
                             few_shot_prompt1 = FewShotPromptTemplate(
                                 examples=examples1,
                                 example_prompt=PromptTemplate.from_template(
-                                    "User input: {input}\nSQL query: {query}"
+                                    "User input: {input}\nSQL query: {query}\n answer: {answer}"
                                 ),
                                 input_variables=["input", "dialect", "top_k"],
                                 prefix=system_prefix1,
@@ -1693,15 +1713,41 @@ def main():
                                 prompt=full_prompt1,
                                 verbose=True,
                                 agent_type="openai-tools",
+                                memory=memory,
                             )
 
                             res1 = agent.invoke({"input": user_input})
 
+                            st.session_state[f"past2{index1}"].append(user_input)
+                            st.session_state[f"generated2{index1}"].append(res1["output"])
+
+
                         except Exception as e:
-                            res1["ouput"] = "Sorry , I can't get that. Can you please ask again?"
+            
+                            st.session_state[f"past2{index1}"].append(user_input)
+                            st.session_state[f"generated2{index1}"].append("Sorry , I can't get that. Can you please ask again?")
+
+                        
+
+                    else :
+
+                        llm = ChatGroq(temperature=0.1,
+                                        groq_api_key="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",
+                                        model_name=model1)
+
+                        agent = create_sql_agent(
+                                    llm=llm,
+                                    db=db,
+                                    verbose=True,
+                                    agent_type="openai-tools",
+                                    memory=memory,
+                                )
+
+                        res1 = agent.invoke({"input": user_input})
 
                         st.session_state[f"past2{index1}"].append(user_input)
                         st.session_state[f"generated2{index1}"].append(res1["output"])
+        
 
                     # ----------------------------------------Normal Chat-------------------------------------------
 

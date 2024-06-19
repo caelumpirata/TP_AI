@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y git
 RUN apt install -y build-essential
 
 RUN pip install --user --no-cache-dir --upgrade pip
-
+RUN pip install streamlit-authenticator
 RUN pip install tabulate
 RUN pip install langchain-community
 RUN pip install numexpr
@@ -23,9 +23,9 @@ RUN pip install streamlit_extras streamlit_modal
 RUN pip install langchain_experimental streamlit matplotlib pandas streamlit_chat pygwalker langchain openai psycopg2 langchain_core langchain_groq
 
 
-COPY chrt.py .
-COPY style.css .
+COPY Login.py .
+COPY config.yaml .
 COPY numbers.txt .
 
 
-CMD ["streamlit", "run", "chrt.py"]
+CMD ["streamlit", "run", "Login.py"]

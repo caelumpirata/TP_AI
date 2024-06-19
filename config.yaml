@@ -1,0 +1,33 @@
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  usernames:
+    dnn:
+      email: dem@gmail.com
+      failed_login_attempts: 0
+      logged_in: true
+      name: dinesh
+      password: $2b$12$E4mXcvGLIQU67aH7ataF2eGlgkPlHwtXcZk/0eIp.oye15GGEGH8a
+    dns:
+      email: dem12@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: dinesh
+      password: $2b$12$ktUpjwPNBKv8cS2Hg25oSejB7rWybJetinqAE8AcnBe3Yqj1KRlIK
+    jsmith:
+      email: dinusuthar@gmail.com
+      failed_login_attempts: 0
+      logged_in: true
+      name: Dinesh Suthar
+      password: $2b$12$jSUAW.rzPdA8UyJT6PGcEO/gbogGCBA4ms86qjVamUPosG6E8viVu
+    rbriggs:
+      email: rbrig@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Rebecca Briggs
+      password: $2b$12$YeWMEI4Fj7V85SieDRWZ9ulrA89lRlTznHnF03kr..PPNhxqlE3g.
+pre-authorized:
+  emails:
+  - melsby@gmail.com
