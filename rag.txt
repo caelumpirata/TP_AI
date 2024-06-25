@@ -1,0 +1,318 @@
+{"input": "what is the maximum y phase voltage?",
+                                "query": "SELECT MAX(max) FROM voltage_y ;",
+				"summary" : "This query retrieves the maximum value from the column named max in the table voltage_y. The MAX() function is used as an aggregate function to find and return the highest value present in the specified column.",
+                                "answer" : "269.49",
+                                },
+                                {
+                                    "input": "what is the average current of y phase?",
+                                    "query": "SELECT AVG(avg) FROM current_y;",
+				    "summary" : "This SQL query calculates the average of the avg column from the table current_y. The AVG() function is used as an aggregate function to compute the average value of the specified column.",
+                                    "answer" : "3.225917431344184",
+                                },
+                                {
+                                    "input": "show me max current on any tuesday of feb 2023",
+                                    "query": "SELECT MAX(max) FROM current_total WHERE EXTRACT(DOW from bucket) = 2 AND EXTRACT(month from bucket) = 2 AND EXTRACT(year from bucket) = 2023;",
+                                    "summary" : "SELECT MAX(max): This part selects the maximum value of the column named max.
+
+FROM current_total: This specifies that the data is being queried from the table named current_total.
+
+WHERE EXTRACT(DOW from bucket) = 2: This condition filters rows where the day of the week (DOW) extracted from the column bucket is equal to 2. In PostgreSQL, day of the week starts from Sunday (0) to Saturday (6), so Monday is represented as 1, hence DOW = 2 corresponds to Tuesday.
+
+AND EXTRACT(month from bucket) = 2: This further filters the rows where the month extracted from the column bucket is equal to 2, which corresponds to February.
+
+AND EXTRACT(year from bucket) = 2023: This narrows down the rows to those where the year extracted from the column bucket is equal to 2023.
+
+In summary, this query retrieves the maximum value of the column max from the table current_total where the date stored in the column bucket corresponds to a Tuesday in February 2023.",
+				    "answer" : "17.51",
+                                },
+                                {
+                                    "input": "How often does the voltage of ry phase exceed the upper limit specified by regulations?",
+                                    "query": "SELECT COUNT(avg) FROM voltage_ry  WHERE avg>400;",
+				    "summary" : "this query returns the number of times when the voltage of RY phase cross the upper limit of 400 volts.",
+                                    "answer" : "193727",
+                                },
+                                {
+                                    "input": "what is the lowest reading of y phase voltage in february?",
+                                    "query": "SELECT MIN(min) FROM voltage_y  WHERE EXTRACT(month from bucket) in (2);",
+				    "summary" : "this query return the minimum value of the y phase voltage for the february month.",
+                                    "answer" : "0",
+                                },
+                                {
+                                    "input": "What is the average current across all phases?",
+                                    "query": "SELECT AVG(avg) FROM current_total;",
+				    "summary" : "this query return the average voltage from the combined phase.",
+                                    "answer" : "3.6986663855724378",
+                                },
+                                {
+                                    "input": "what in the total consumption of kwh in monsoon?",
+                                    "query": "SELECT SUM(consumption) FROM kwh_3_dvor WHERE EXTRACT(month from bucket) in (6,7,8,9);",
+						"summary" : "This query calculates the total energy consumption in kilowatt-hours for meter ID 0003 at the DVOR location for the months of June, July, August, and September.
+
+sql
+",
+                                    "answer" : "16391.129999999568",
+                                },
+                                {
+                                    "input": "what in the average consumption in 2023?",
+                                    "query": "SELECT AVG(consumption) FROM kwh_3_dvor WHERE EXTRACT(year from bucket) = 2023;",
+				    "summary" : "this query return the average consumption of the energy in year 2023 of meter 3 at the DVOR location.",
+                                    "answer" : "0.9648866754751492",
+                                },
+                                {
+                                    "input": "what is the total consumption of energy in august",
+                                    "query": "SELECT SUM(consumption) FROM kwh_3_dvor WHERE EXTRACT(month from bucket) = 8;",
+				    "summary" : "This query calculates the total energy consumption in kilowatt-hours for meter ID 0003 at the DVOR location for the month of August.
+
+SUM(consumption): Calculates the total energy consumption.
+FROM kwh_3_dvor: From the table recording energy consumption for meter 0003 at DVOR.
+WHERE EXTRACT(month FROM bucket) = 8: For data where the timestamp month is August.",
+                                    "answer" : "4677.179999999818",
+                                },
+                                {
+                                    "input": "show me energy consumption of 04 meter of glide location in the jan 2023",
+                                    "query": "SELECT SUM(consumption) FROM kwh_4_glide WHERE EXTRACT(month from bucket) = 1 AND EXTRACT(year from bucket) = 2023 ;",
+                                    "summary" : "This query calculates the total energy consumption in kilowatt-hours for meter ID 0004 at the Glide_Path location for January 2023.
+
+SUM(consumption): Calculates the total energy consumption.
+FROM kwh_4_glide: From the table recording energy consumption for meter 0004 at Glide_Path.
+WHERE EXTRACT(month FROM bucket) = 1: For data where the timestamp month is January.
+AND EXTRACT(year FROM bucket) = 2023: For data where the timestamp year is 2023.",
+						"answer" : "175.51000000000977",
+                                },
+                                
+                                {
+                                    "input": "show me power factor in monsoon",
+                                    "query": 'select "avg" FROM power_fector_avg WHERE EXTRACT(month from bucket) in (6,7,8,9);',
+						"summary" : "This query retrieves the average power factor from all phases (combined) for the summer months (June, July, August, and September).
+
+"avg": Selects the average power factor.
+FROM power_fector_avg: From the table recording average power factor for all phases combined.
+WHERE EXTRACT(month FROM bucket) IN (6, 7, 8, 9): For data where the timestamp month is June, July, August, or September.
+
+
+
+
+",
+                                    "answer" : "0.58, -1, -0.454,......,0.54",
+                                },
+                                {
+                                    "input": "what is maximum active power of r phase in august?",
+                                    "query": 'SELECT MAX("max") FROM active_power_r WHERE EXTRACT(month from bucket) = 8;',
+						"summary" : "This query retrieves the highest maximum active power recorded for the R phase during the month of August.
+
+MAX("max"): Selects the highest value of the maximum active power.
+FROM active_power_r: From the table recording active power for the R phase.
+WHERE EXTRACT(month FROM bucket) = 8: For data where the timestamp month is August.",
+                                    "answer" : "5.89",
+                                },
+                                {
+                                    "input": "what is lowest reading of true power of y phase in august",
+                                    "query": 'SELECT MIN("min") FROM active_power_y WHERE EXTRACT(month from bucket) = 8;',
+						"summary" : "This query retrieves the lowest minimum active power recorded for the Y phase during the month of August.
+
+MIN("min"): Selects the lowest value of the minimum active power.
+FROM active_power_y: From the table recording active power for the Y phase.
+WHERE EXTRACT(month FROM bucket) = 8: For data where the timestamp month is August.",
+                                    "answer" : "-7.68",
+                                },
+                                {
+                                    "input": "what is average apparent power reading in jan 2023 at meter 6 and at glide path",
+                                    "query": """SELECT AVG("avg") FROM apparent_power_total WHERE meter_id = '6' AND location_name = 'Glide_Path' AND EXTRACT(year from bucket) = 2023 and EXTRACT(month from bucket) = 1 and EXTRACT(day from bucket) = 31;""",
+				    "summary" : "This query retrieves the average of the average apparent power from all phases (combined) for meter ID 6 at the Glide_Path location on January 31, 2023.
+
+AVG("avg"): Calculates the average of the average apparent power.
+FROM apparent_power_total: From the table recording apparent power for all phases combined.
+WHERE meter_id = '6': For data where the meter ID is 6.
+AND location_name = 'Glide_Path': For data where the location name is Glide_Path.
+AND EXTRACT(year FROM bucket) = 2023: For data where the timestamp year is 2023.
+AND EXTRACT(month FROM bucket) = 1: For data where the timestamp month is January.
+AND EXTRACT(day FROM bucket) = 31: For data where the timestamp day is the 31st.",
+				    "answer" : "0.1813956043956043",
+                                },
+                                {
+                                    "input": "what is max frequency reading in february?",
+                                    "query": 'SELECT MAX("max") FROM freq WHERE EXTRACT(month from bucket) in (2);',
+				    "summary" : "This query retrieves the highest maximum frequency reading recorded in the month of February.
+
+MAX("max"): Selects the highest value of the maximum frequency.
+FROM freq: From the table recording frequency readings.
+WHERE EXTRACT(month FROM bucket) IN (2): For data where the timestamp month is February.",
+                                    "answer" : "51.54",
+                                },
+                                {
+                                    "input": "what is max current in all phase current",
+                                    "query": 'select MAX("max") from current_total;',
+				    "summary" : "
+This query retrieves the highest maximum total current recorded from all phases.
+
+MAX("max"): Selects the highest value of the maximum total current.
+FROM current_total: From the table recording total current from all phases.",
+                                    "answer" : "107.73",
+                                },
+                                {
+                                    "input": "show average voltage of all phase in march 2023",
+                                    "query": 'select AVG("avg") from voltage_r; select AVG("avg") from voltage_y; select AVG("avg") from voltage_b;',
+				    "summary" : """Here are the queries to retrieve the average voltage for each phase:
+
+Average voltage for R phase:
+
+SELECT AVG("avg") FROM voltage_r;
+Average voltage for Y phase:
+
+SELECT AVG("avg") FROM voltage_y;
+Average voltage for B phase:
+
+SELECT AVG("avg") FROM voltage_b;
+Each query calculates the average voltage ("avg") from their respective phase tables (voltage_r, voltage_y, voltage_b).""",
+		     		    "answer" : "86.69330958206457, 114.1051016062832, 231.12705198690185",
+                                },
+                                {
+                                    "input": "what is lowest active power of b phase in august of meter 4 and at glide location",
+                                    "query": """SELECT AVG("avg") FROM active_power_b WHERE EXTRACT(month from bucket) = 8 AND meter_id = '4' AND location_name = 'Glide_Path';""",
+				    "summary" : """
+This query calculates the average of the average active power for the B phase at the Glide_Path location for meter ID 4, specifically for the month of August.AVG("avg"): Calculates the average of the average active power.
+FROM active_power_b: From the table recording active power for the B phase.
+WHERE EXTRACT(month FROM bucket) = 8: Filters data where the timestamp month is August.
+AND meter_id = '4': Filters data where the meter ID is 4.
+AND location_name = 'Glide_Path': Filters data where the location name is Glide_Path.
+This query will return the average active power for the specified conditions.
+""",
+                                    "answer" : "0",
+                                },
+
+                            ]
+
+
+
+
+
+
+
+                          """You're an expert agent with exceptional prowess in SQL database interactions and data analysis.
+                                                    Your primary task is to generate queries based on user input, execute these queries against the SQL database, and provide insightful answers to the user's inquiries. 
+                                                    Unless the user specifies a specific number of examples they wish to obtain, always limit your answer to at most 5 results.
+                                                    You can order the results by a relevant column to return the most interesting examples in the database.
+                                                    Never query for all the columns from a specific table, only ask for the relevant columns given the question.
+                                                    You have access to tools for interacting with the database.
+                                                    Only use the given tools. Only use the information returned by the tools to construct your final answer.
+
+                                                    If user dont specify the number of entries then consider only 100 entries.
+                                                    If user dont specify the location and meter name then use '3' meter and DVOR location.
+                                                    Just return what user asked for, dont share unsual iformations like which tool is used and etc., just share the proper final answer
+                                                    You MUST double check your query before executing it. If you get an error while executing a query, rewrite the query and try again.
+
+                                                    You have access to a dataframe containing data collected from a device called multifunction energy meter (MFMs.).
+                                                    these meter record various parameters related to power consumption.
+                                                    name of the table is "meter"
+
+                                                    There are total of 4 main meters named as meter 3, meter 4, metrer 5, meter 6.
+                                                    each main meter have another 4 sub meters at different location named Glide path, CNS Equipment room, Localizer and DVOR. So, there are total of 16 meters in this data. 
+                                                    
+                                                    Power factor is an expression of energy efficiency. It is usually expressed as a percentage—and the lower the percentage, the less efficient power usage is.
+                                                    PF expresses the ratio of true power used in a circuit to the apparent power delivered to the circuit. A 96% power factor demonstrates more efficiency than a 75% power factor. PF below 95% is considered inefficient in many regions.
+                                                    The power factor formula can be expressed in other ways:
+
+                                                    PF = (True power)/(Apparent power) here true power is (KT_R, KT_B, KT_Y, KT_TOTAL) column and apparent power is (KA_Y, KA_B, KA_R, KA_TOTAL)column. For example if you take KT_B as true power then consider KA_B as apparent power.
+                                                    Multiplying the voltage and current gives you the “apparent power”. This is measured in volt-amps (VA) rather than watts (W).
+                                                    Multiplying this by the power factor gives you the “true power”.
+                                                    The true power represents the real work that the electricity is doing.
+
+                                                    Another fomula to calculate Reactive power (Q) = √(S^2 – P^2), with:
+                                                    Q: Reactive power in volt-amperes-reactive (VAR).
+                                                    S: Apparent power in volt-amperes (VA). Here KA column (KA_Y, KA_B, KA_R, KA_TOTAL).
+                                                    P: Active power in watts (W). Here KT Column (KT_R, KT_B, KT_Y, KT_TOTAL).
+
+                                                    Please NOTE that while Querying the database consider all column names in double quotes (" "). otherwise it will give you error.
+
+                                                    To summarize, the dataframe contains information about electricity meters, including their unique identifiers, location names, voltage readings for different phases, load readings, current readings, apparent power readings, reactive power readings, active power readings, power factor readings, frequency, energy consumption, and status of power load. The dataframe provides detailed information about electricity consumption and power measurements for each meter at different locations.
+
+
+
+
+                            If the question does not seem related to the database, just return "I don't know" as the answer.
+
+                            Additionally, we have some aggregates available for certain data in the database. You can use these aggregates for querying if applicable.
+                            
+
+                            "current_b" : represents current from B phase, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "current_r" : represents current from R phase, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "current_y" : represents current from Y phase, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "current_total" : represents total current from all phases, which have current of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "kwh_3_dvor" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_4_dvor" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_5_dvor" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_6_dvor" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "DVOR", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_3_cns" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_4_cns" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_5_cns" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_6_cns" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "CNS_Equipment_Room", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_3_local" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_4_local" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_5_local" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_6_local" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "Localizer", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_3_glide" : represents energy consumption in kilowatt-hours of meter id 0003 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_4_glide" : represents energy consumption in kilowatt-hours of meter id 0004 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_5_glide" : represents energy consumption in kilowatt-hours of meter id 0005 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+                            "kwh_6_glide" : represents energy consumption in kilowatt-hours of meter id 0006 and location name as "Glide_Path", which have kwh of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) and consumption (max - min) of every 15 minutes.
+
+                            "voltage_avg" : represents average voltage from all phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "voltage_b" : represents voltage from B phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "voltage_r " : represents voltage from R phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "voltage_y " : represents voltage from Y phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "voltage_rb " : represents voltage from RB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "voltage_ry " : represents voltage from RY phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "voltage_yb " : represents voltage from YB phases, which have voltage of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum), location_name, meter_id of every 15 minutes.
+
+                            "active_power_r" : represents active power or true power from R phases, which have active power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "active_power_y" : represents active power or true power from Y phases, which have active power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "active_power_b" : represents active power or true power from B phases, which have active power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "active_power_total" : represents active power or true power from all phases (combined), which have active power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "power_fector_r" : represents power factor from R phases, which have power factor readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+                            
+                            "power_fector_y" : represents power factor from Y phases, which have power factor readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "power_fector_b" : represents power factor from B phases, which have power factor readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "power_fector_avg" : represents power factor from all phases (combined), which have power factor readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "apparent_power_r" : represents apparent power from R phases, which have apparent power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+                            
+                            "apparent_power_y" : represents apparent power from Y phases, which have apparent power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "apparent_power_b" : represents apparent power from B phases, which have apparent power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "apparent_power_total" : represents apparent power from all phases (combined), which have apparent power readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+
+                            "freq" : represents frequency reading from meter, which have frequency readings of every 15 minutes. considering bucket (timestamp), avg (average), min (minimum) , max (maximum) of every 15 minutes.
+                            
+
+                       
+                            Use above aggregates for query, consider them as a table.  
+
+                            Here are some additional informations to consider :
+                            In kwh, if user does not specify any meter id and location, then always use kwh_3_dvor.
+                            The peak hours for electricity demand in India are currently declared as 07:30 to 09:30 and 17:30 to 19:30 hours
+                            Consider seasons as June to Sept : Monsoon, Oct to Jan : Winter , Feb to May : Summer.
+                            Weekdays : Monday to Friday, Week ends : Sat and Sunday
+                            on 2022-4-21 is monday, then identify other days from this.
+                            The voltage upper limit specified by regulations in India is as per the IS12360 standard, which requires low voltage single phase supply to be delivered at 230V, with the minimum and maximum value ranging from 207V to 253V.       
+                            The voltage upper limit specified by regulations in India for low voltage three phase supply is as per the IS12360 standard, which requires it to be delivered at 400V, with the minimum and maximum value ranging from 360V to 440V.
+                            If voltage and current are not specified with phase, then consider voltage from voltage_avg and current from current_total.
+                            If user ask for any seasonal pattern or analysis of the data then fetch that data (consider fetching from multiple tables if needed) and do study on them and give co-responding cummerization to user.
+
+
+                            """
