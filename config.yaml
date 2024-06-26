@@ -7,7 +7,7 @@ credentials:
     dnn:
       email: dem@gmail.com
       failed_login_attempts: 0
-      logged_in: true
+      logged_in: false
       name: dinesh
       password: $2b$12$E4mXcvGLIQU67aH7ataF2eGlgkPlHwtXcZk/0eIp.oye15GGEGH8a
     dns:

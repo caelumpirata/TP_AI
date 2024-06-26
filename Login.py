@@ -81,11 +81,8 @@ output = None
 authenticator.login()
 
 if not st.session_state["authentication_status"]:
-    st.link_button(
-            "Sign up",
-            url=f"https://www.tpcloud.tech/register",
-            use_container_width=True
-        )
+    if st.button("Sign up"):
+        st.switch_page("pages/register.py")
 
 
 if st.session_state["authentication_status"]:

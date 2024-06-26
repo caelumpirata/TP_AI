@@ -3,7 +3,7 @@ FROM python:3.11-buster
 # Set the working directory to /app
 WORKDIR /app
 
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/pages
 
 # docker buildx build --platform linux/amd64 -t dinesh214/chatbot:feb09 --push .
 
@@ -23,6 +23,7 @@ RUN pip install streamlit_extras streamlit_modal
 RUN pip install langchain_experimental streamlit matplotlib pandas streamlit_chat pygwalker langchain openai psycopg2 langchain_core langchain_groq
 
 
+COPY register.py /app/pages
 COPY Login.py .
 COPY config.yaml .
 COPY numbers.txt .

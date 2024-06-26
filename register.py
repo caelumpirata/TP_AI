@@ -27,8 +27,5 @@ except Exception as e:
     st.error(e)
 
 
-st.link_button(
-            "Login",
-            url=f"https://www.tpcloud.tech",
-            use_container_width=True
-        )
+if st.button("Login"):
+    st.switch_page("Login.py")
