@@ -41,7 +41,7 @@ memory = ConversationBufferWindowMemory(k=7)
 pg_uri = "postgresql+psycopg2://master:0r5VB[TL?>A/8,}<vkpmEwS)@65.20.77.132:32432/ems_ai"
 db = SQLDatabase.from_uri(pg_uri)
 
-conn = create_database_connection("65.20.77.132:32432", "master", "0r5VB[TL?>A/8,}<vkpmEwS)", "ems_ai", "32432")
+conn = create_database_connection("65.20.77.132", "master", "0r5VB[TL?>A/8,}<vkpmEwS)", "ems_ai", "32432")
 dfmain = pd.read_sql_query("SELECT * FROM meter LIMIT 50000", conn)
 
 
@@ -81,18 +81,11 @@ output = None
 authenticator.login()
 
 if not st.session_state["authentication_status"]:
-    sign = st.radio("Sign up")
-    if sign:
-        try:
-            email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(pre_authorization=False)
-            if email_of_registered_user:
-                st.success('User registered successfully')
-
-                with open(r'config.yaml', 'w') as file:
-                    yaml.dump(config, file, default_flow_style=False)
-
-        except Exception as e:
-            st.error(e)
+    st.link_button(
+            "Sign up",
+            url=f"https://www.tpcloud.tech/register",
+            use_container_width=True
+        )
 
 
 if st.session_state["authentication_status"]:
@@ -115,7 +108,6 @@ if st.session_state["authentication_status"]:
     }
 
     div.row-widget.stButton[data-testid="stButton"]{
-
     right: -40.5rem;
     width: 80px;
     top: 2%;
@@ -138,7 +130,7 @@ if st.session_state["authentication_status"]:
     response_container = st.container()
 
     # add new chat button
-    add = st.sidebar.button("➕ New Chat")
+    add = st.sidebar.button("➕ New Chat", key="add")
 
     if add:
         num = read_numbers_from_file()
@@ -154,6 +146,7 @@ if st.session_state["authentication_status"]:
 
     # Update index1 based on the selected chat
     index1 = st.session_state.chats.index(selected_chat_index)
+
     st.sidebar.title("Navigation")
     selection = st.sidebar.radio("Go to", ["Chat", "EDA"], key="navigation_radio")
 
